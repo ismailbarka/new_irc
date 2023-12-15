@@ -21,7 +21,7 @@ int main() {
         std::cout << "socket to non-blocking mode\n";
     }
 
-    // Set up server address structure
+    // Set up server address structure	`1!!!!!!!
     struct sockaddr_in server_adr;
     memset(&server_adr, '\0', sizeof(server_adr));
     server_adr.sin_family = AF_INET;
@@ -64,6 +64,10 @@ int main() {
             // Accept the new client
             struct pollfd newClientPoll;
             newClientPoll.fd = accept(sock, NULL, NULL);
+			if (newClientPoll.fd < 0) {
+				perror("accept error");
+				// Handle the error as needed
+			}
             newClientPoll.events = POLLIN;
             newClientPoll.revents = 0;
 
@@ -87,16 +91,17 @@ int main() {
                 } else {
                     // Check if the client is new or already in the map
                     std::map<int, Client>::iterator it = ClientsMap.find(_fds[i].fd);
-                    if(it == ClientsMap.end()) {
+                    if (it == ClientsMap.end()) {
                         // New client authentication
                         std::string line = buffer;
-                        if(line == "PASS\n") {
+                        if (line == "PASS\n") {
+							std::cout << "valid PASS: " << line << std::endl;
                             std::cout << "new client added\n";
                             write(_fds[i].fd, "welcome to the server\n", 22);
                             Client newClien(_fds[i]);
                             ClientsMap[_fds[i].fd] = newClien;
                         } else {
-                            std::cout << "wrong pass\n";
+                            std::cout << "wrong pass: " << line << std::endl;
                             write(_fds[i].fd, "wrong pass retry\n", 17);
                         }
                         memset(buffer, 0, 1024);
@@ -110,15 +115,24 @@ int main() {
                             std::getline(iss,line);
                             it->second.setuserName(line);
                             it->second.setIsAutonticated();
-                            std::cout  << "is auto : " << it->second.getIsAutonticated() << std::endl;
-                        } else if(line == "NICK") {
+                            std::cout  << "is auto : " << std::boolalpha << it->second.getIsAutonticated() << std::endl;
+                        } else if (line == "NICK") {
                             // Set nickname for the client
                             std::getline(iss,line);
                             it->second.setNickname(line);
                             std::cout << line << std::endl;
                             it->second.setIsAutonticated();
                             std::cout  << "is auto : " << it->second.getIsAutonticated() << std::endl;
-                        }
+                        } else if (it->second.getIsAutonticated()) {
+							//read message
+							std::cout << "message from client: " << it->second.getNickname() << std::endl;
+							buffer[readed] = '\0';
+							std::cout << buffer;
+							//answer to client
+							std::string answer = "Message received\n";
+							write(_fds[i].fd, answer.c_str(), answer.size());
+
+						}
                     }
                 }
             }
