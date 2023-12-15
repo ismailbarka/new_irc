@@ -21,6 +21,7 @@ private:
     std::string nickName;
     std::string userName;
     bool isAutonticated;
+	std::vector<std::string> commandList;
 public:
     void setPollfd(struct pollfd _pFd)
     {
@@ -58,7 +59,15 @@ public:
         nickName = "";
         userName = "";
         isAutonticated = false;
+		fillCommandList();
     }
+	void fillCommandList()
+	{
+		commandList.push_back("USER");
+		commandList.push_back("NICK");
+		commandList.push_back("LIST");
+		commandList.push_back("QUIT");
+	}
     ~Client();
 };
 
