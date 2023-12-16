@@ -52,6 +52,9 @@ public:
         if(nickName.length() > 0 && userName.length() > 0)
             isAutonticated = true;
     }
+	int getfd(){
+		return pFd.fd;
+	}
     Client();
     Client(struct pollfd client)
     {

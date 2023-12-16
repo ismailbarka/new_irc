@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/16 16:21:43 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/16 18:41:07 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,10 @@ public:
 			std::cout << "Invalid NickName" << std::endl;
 			return;
 		}
+		if (ClientsMap.find(_pfds[i].fd) != ClientsMap.end() && ClientsMap[_pfds[i].fd].getIsAutonticated()) {
+			std::cout << "client already authenticated" << std::endl;
+			return;
+		}
 		std::string nickName = params.substr(0, params.find("\r"));
 		std::cout << "nickName: " << nickName << std::endl;
 		ClientsMap[_pfds[i].fd].setNickname(nickName);
@@ -121,7 +125,11 @@ public:
 		params = trimString(params);
 		if (params.empty())
 		{
-			std::cout << "Invalid UserNAme" << std::endl;
+			std::cout << "Invalid UserName" << std::endl;
+			return;
+		}
+		if (ClientsMap.find(_pfds[i].fd) != ClientsMap.end() && ClientsMap[_pfds[i].fd].getIsAutonticated()) {
+			std::cout << "client already authenticated" << std::endl;
 			return;
 		}
 		std::string userName = params.substr(0, params.find(" "));
@@ -140,7 +148,8 @@ public:
 		std::cout << "clients_numbers: " << clients_numbers - 1 << std::endl;
 		for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
 			if (it->second.getIsAutonticated()) {
-				std::string response = ": [" + it->second.getNickname() + "]\n";
+				std::string response = ": [" + std::to_string(it->second.getfd());
+				response += "] : [" + it->second.getNickname() + "]\n";
 				std::cout << "response: " << response;
 				send(_pfds[i].fd, response.c_str(), response.length(), 0);
 			}
@@ -149,8 +158,7 @@ public:
 
 	void handleQuitCommand(int i, int & clients_numbers)
 	{
-		std::cout << "client disconnected: " << i << "\n";
-		std::cout << "1 - client nick: " << ClientsMap[_pfds[i].fd].getNickname() << std::endl;
+		std::cout << "client disconnected: " << ClientsMap[_pfds[i].fd].getNickname() << std::endl;
 		ClientsMap.erase(_pfds[i].fd);
 		close(_pfds[i].fd);
 		_pfds[i].fd = -1;
@@ -203,7 +211,8 @@ public:
 		listenSocket();
 		setPollfd();
 		int clients_numbers = 1;
-		while (1) {
+		while (1)
+		{
 			int pollResult = poll(_pfds, clients_numbers, -1);
 			if (pollResult == -1) {
 				perror("poll error");
@@ -230,21 +239,28 @@ public:
 				ClientsMap.insert(std::pair<int, Client>(clientSocket, newClient));
 				clients_numbers++;
 			}
+			//Grap diconnected clients
 			for (int i = 1; i < clients_numbers; i++) {
 				if (_pfds[i].revents == POLLIN) {
 					char buffer[1024];
 					memset(buffer, '\0', 1024);
 					int readed = recv(_pfds[i].fd, buffer, 1024, 0);
 					if (readed < 0)
+					{
+						std::cout << "0 - ======> HERE" << std::endl;
 						throw std::exception();
+					}
 					if (readed == 0) {
+						std::cout << "1 - ======> HERE" << std::endl;
 						std::cout << "client disconnected\n";
+						ClientsMap.erase(_pfds[i].fd);
 						close(_pfds[i].fd);
 						_pfds[i].fd = -1;
 						_pfds[i].events = 0;
 						_pfds[i].revents = 0;
 						clients_numbers--;
-					} else {
+					} else if (readed > 0) {
+						std::cout << "2 - ======> HERE" << std::endl;
 						std::cout << "\n==> received: " << buffer << std::endl;
 						std::string message(buffer);
 						//Command
@@ -258,6 +274,7 @@ public:
 						else
 							params = "";
 						params = params.substr(0, params.find("\n"));
+						params = params.substr(0, params.find("\r"));
 						std::cout << "command: [" << command << "]" << std::endl;
 						std::cout << "params: [" << params << "]" << std::endl;
 						// split params userName 0 * NickName
