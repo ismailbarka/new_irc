@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/15 17:42:38 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/16 16:21:43 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,46 +90,73 @@ public:
 		_pfds[index] = _pfd;
 	}
 
+	std::string trimString(const std::string& str) {
+		size_t start = 0;
+		size_t end = str.length();
+
+		while (start < end && std::isspace(str[start]))
+			++start;
+		while (end > start && std::isspace(str[end - 1]))
+			--end;
+		return str.substr(start, end - start);
+	}
+
 	void handleNickCommand(std::string params, int i)
 	{
-		std::string nickName = params.substr(0, params.find(" "));
+		params = trimString(params);
+		if (params.empty())
+		{
+			std::cout << "Invalid NickName" << std::endl;
+			return;
+		}
+		std::string nickName = params.substr(0, params.find("\r"));
 		std::cout << "nickName: " << nickName << std::endl;
 		ClientsMap[_pfds[i].fd].setNickname(nickName);
 		ClientsMap[_pfds[i].fd].setIsAutonticated();
-		std::cout << "isAutonticated: " << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
+		std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
 	}
 
 	void handleUserCommand(std::string params, int i)
 	{
+		params = trimString(params);
+		if (params.empty())
+		{
+			std::cout << "Invalid UserNAme" << std::endl;
+			return;
+		}
 		std::string userName = params.substr(0, params.find(" "));
+		userName = userName.substr(userName.find(" ") + 1);
+		userName = userName.substr(0, userName.find(" "));
+		userName = userName.substr(userName.find("\n") + 1);
 		std::cout << "userName: " << userName << std::endl;
 		ClientsMap[_pfds[i].fd].setuserName(userName);
 		ClientsMap[_pfds[i].fd].setIsAutonticated();
-		std::cout << "isAutonticated: " << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
-	}
-
-	void handleQuitCommand(int i, int & clients_numbers)
-	{
-		std::cout << "client disconnected\n";
-		close(_pfds[i].fd);
-		_pfds[i].fd = -1;
-		_pfds[i].events = 0;
-		_pfds[i].revents = 0;
-		clients_numbers--;
-		ClientsMap.erase(_pfds[i].fd);
+		std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
 	}
 
 	void handleListCommand(int i, int clients_numbers)
 	{
 		std::map<int, Client>::iterator it;
-		std::cout << "clients_numbers: " << clients_numbers << std::endl;
+		std::cout << "clients_numbers: " << clients_numbers - 1 << std::endl;
 		for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
 			if (it->second.getIsAutonticated()) {
-				std::string response = it->second.getNickname() + "\n";
-				std::cout << "response: " << response << std::endl;
+				std::string response = ": [" + it->second.getNickname() + "]\n";
+				std::cout << "response: " << response;
 				send(_pfds[i].fd, response.c_str(), response.length(), 0);
 			}
 		}
+	}
+
+	void handleQuitCommand(int i, int & clients_numbers)
+	{
+		std::cout << "client disconnected: " << i << "\n";
+		std::cout << "1 - client nick: " << ClientsMap[_pfds[i].fd].getNickname() << std::endl;
+		ClientsMap.erase(_pfds[i].fd);
+		close(_pfds[i].fd);
+		_pfds[i].fd = -1;
+		_pfds[i].events = 0;
+		_pfds[i].revents = 0;
+		clients_numbers--;
 	}
 
 	void handlePrivMsg(std::string params, int i)
@@ -142,8 +169,8 @@ public:
 			std::map<int, Client>::iterator it;
 			for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
 				if (it->second.getIsAutonticated() && it->second.getNickname() != ClientsMap[_pfds[i].fd].getNickname()) {
-					std::string response = "Message from [" + ClientsMap[_pfds[i].fd].getNickname();
-					response += "@" + ClientsMap[_pfds[i].fd].getNickname() + "]: " + message + "\n";
+					//irc message format
+					std::string response = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PRIVMSG " + target + " :" + message + "\n";
 					std::cout << "response: " << response << std::endl;
 					send(it->first, response.c_str(), response.length(), 0);
 				}
@@ -152,11 +179,20 @@ public:
 			std::map<int, Client>::iterator it;
 			for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
 				if (it->second.getIsAutonticated() && it->second.getNickname() == target) {
-					std::string response = "Message from [" + ClientsMap[_pfds[i].fd].getuserName();
-					response += "@" + ClientsMap[_pfds[i].fd].getNickname() + "]: " + message + "\n";
+					std::string response = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PRIVMSG " + target + " :" + message + "\n";
 					std::cout << "response: " << response << std::endl;
-					send(it->first, response.c_str(), response.length(), 0);
+					try {
+						send(it->first, response.c_str(), response.length(), 0);
+					} catch (std::exception & e) {
+						std::cout << "exception: " << e.what() << std::endl;
+					}
+					break;
 				}
+			}
+			if (it == ClientsMap.end()) {
+				std::string response = "Error sending messgae, no such nick: [ " + target + " ]\n";
+				std::cout << "response: " << response << std::endl;
+				send(_pfds[i].fd, response.c_str(), response.length(), 0);
 			}
 		}
 	}
@@ -174,9 +210,9 @@ public:
 			}
 			if (_pfds[0].revents == POLLIN) {
 				std::cout << "new client connected\n";
-				struct sockaddr_in client_adr;
-				socklen_t client_adr_size = sizeof(client_adr);
-				int clientSocket = accept(serverSocket, (struct sockaddr *)&client_adr, &client_adr_size);
+				struct sockaddr_in client_addr;
+				socklen_t client_addr_size = sizeof(client_addr);
+				int clientSocket = accept(serverSocket, (struct sockaddr *)&client_addr, &client_addr_size);
 				if (clientSocket < 0)
 					throw std::exception();
 				int nFl = fcntl(clientSocket, F_SETFL, O_NONBLOCK);
@@ -209,32 +245,41 @@ public:
 						_pfds[i].revents = 0;
 						clients_numbers--;
 					} else {
-						std::cout << "received: " << buffer << std::endl;
+						std::cout << "\n==> received: " << buffer << std::endl;
 						std::string message(buffer);
-						std::string command = message.substr(0, message.find(" "));
-						std::string params = message.substr(message.find(" ") + 1);
+						//Command
+						size_t pos = message.find(" ");
+						std::string command = message.substr(0, pos);
+						command = command.substr(0, command.find("\n"));
+						//Params
+						std::string params;
+						if (pos != std::string::npos)
+						 	params = message.substr(pos + 1);
+						else
+							params = "";
 						params = params.substr(0, params.find("\n"));
-						std::cout << "command: " << command << std::endl;
-						std::cout << "params: " << params << std::endl;
+						std::cout << "command: [" << command << "]" << std::endl;
+						std::cout << "params: [" << params << "]" << std::endl;
+						// split params userName 0 * NickName
 						if (command == "NICK") {
 							handleNickCommand(params, i);
 						} else if (command == "USER") {
 							handleUserCommand(params, i);
-						} else if (command == "QUIT\n") {
+						} else if (command == "QUIT\n" || command == "QUIT") {
 							handleQuitCommand(i, clients_numbers);
 						} else if (command == "PRIVMSG") {
 							handlePrivMsg(params, i);
-						} else if (command == "LIST\n") {
+						} else if (command == "LIST" || command == "LIST\n") {
 							handleListCommand(i, clients_numbers);
 						} else {
 							std::string response = command.substr(0, command.find("\n")) + " " + "Unknown command" + "\n";
 							std::cout << "response: " << response << std::endl;
 							send(_pfds[i].fd, response.c_str(), response.length(), 0);
 						}
+					}
+				}
 			}
 		}
-	}
-}
 	}
 };
 
