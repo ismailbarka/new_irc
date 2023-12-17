@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/16 18:41:07 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/17 18:01:49 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,9 @@
 #include <netdb.h>
 #include <fcntl.h>
 #include <exception>
+#include <sstream>
+#include <stdio.h>
+#include <arpa/inet.h>
 
 class Client;
 class Server
@@ -54,7 +57,9 @@ public:
 		} else {
 			std::cout << "nRet failed\n";
 		}
-		int nFl = fcntl(serverSocket, F_SETFL, O_NONBLOCK);
+		int nFl = fcntl(serverSocket, F_GETFL, 0);
+		nFl |= O_NONBLOCK;
+		nFl = fcntl(serverSocket, F_SETFL, nFl);
 		if (nFl < 0) {
 			std::cout << "failed to set socket to non-blocking mode\n";
 		} else {
@@ -64,27 +69,32 @@ public:
 		server_adr.sin_family = AF_INET;
 		server_adr.sin_port = htons(5000);
 	}
+
 	void bindSocket()
 	{
 		int bCheck = bind(serverSocket, (struct sockaddr *)&server_adr, sizeof(server_adr));
 		if (bCheck < 0)
 			throw std::exception();
 	}
+
 	void listenSocket()
 	{
 		if (listen(serverSocket, 128) < 0)
 			throw std::exception();
 	}
+
 	void setPollfd()
 	{
 		_pfds[0].fd = serverSocket;
 		_pfds[0].events = POLLIN;
 		_pfds[0].revents = 0;
 	}
+
 	void setPollfd(struct pollfd _pfd)
 	{
 		_pfds[0] = _pfd;
 	}
+
 	void setPollfd(struct pollfd _pfd, int index)
 	{
 		_pfds[index] = _pfd;
@@ -148,8 +158,9 @@ public:
 		std::cout << "clients_numbers: " << clients_numbers - 1 << std::endl;
 		for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
 			if (it->second.getIsAutonticated()) {
-				std::string response = ": [" + std::to_string(it->second.getfd());
-				response += "] : [" + it->second.getNickname() + "]\n";
+				std::string res = "[" + std::to_string(it->second.getfd());
+				res += "] [" + it->second.getNickname() + "]\n";
+				std::string response = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PRIVMSG " + ClientsMap[_pfds[i].fd].getNickname() + " :" + res + "\n";
 				std::cout << "response: " << response;
 				send(_pfds[i].fd, response.c_str(), response.length(), 0);
 			}
@@ -213,11 +224,13 @@ public:
 		int clients_numbers = 1;
 		while (1)
 		{
+			char client_ip[INET_ADDRSTRLEN];
 			int pollResult = poll(_pfds, clients_numbers, -1);
 			if (pollResult == -1) {
-				perror("poll error");
+				perror("poll failed");
+				return ;
 			}
-			if (_pfds[0].revents == POLLIN) {
+			if (_pfds[0].revents & POLLIN) {
 				std::cout << "new client connected\n";
 				struct sockaddr_in client_addr;
 				socklen_t client_addr_size = sizeof(client_addr);
@@ -234,34 +247,60 @@ public:
 				client.fd = clientSocket;
 				client.events = POLLIN;
 				client.revents = 0;
+				inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN);
+				std::cout << "client ip: " << client_ip << std::endl;
 				setPollfd(client, clients_numbers);
 				Client newClient(client);
+				newClient.setClientIp(client_ip);
 				ClientsMap.insert(std::pair<int, Client>(clientSocket, newClient));
 				clients_numbers++;
 			}
 			//Grap diconnected clients
 			for (int i = 1; i < clients_numbers; i++) {
-				if (_pfds[i].revents == POLLIN) {
+				if (_pfds[i].revents & POLLIN) {
 					char buffer[1024];
-					memset(buffer, '\0', 1024);
-					int readed = recv(_pfds[i].fd, buffer, 1024, 0);
-					if (readed < 0)
-					{
+					memset(buffer, 0, sizeof(buffer));
+					size_t readed = recv(_pfds[i].fd, buffer, sizeof(buffer), 0);
+					buffer[readed] = '\0';
+					std::cout << "xxxxxxxx> buffer: [" << buffer << "]" << std::endl;
+					if (readed < 0) {
 						std::cout << "0 - ======> HERE" << std::endl;
 						throw std::exception();
-					}
-					if (readed == 0) {
-						std::cout << "1 - ======> HERE" << std::endl;
-						std::cout << "client disconnected\n";
-						ClientsMap.erase(_pfds[i].fd);
-						close(_pfds[i].fd);
-						_pfds[i].fd = -1;
-						_pfds[i].events = 0;
-						_pfds[i].revents = 0;
-						clients_numbers--;
-					} else if (readed > 0) {
+					} else if (readed == 0) {
+						std::string ss(buffer);
+						if (ss.find("QUIT") != std::string::npos) {
+							std::cout << "==> QUIT" << std::endl;
+							ss = ss.substr(0, ss.find("QUIT"));
+							std::cout << "ss: [" << ss << "]" << std::endl;
+						}
+						//get message from client
+						if (_pfds[i].revents & POLLHUP)
+						{
+							std::cout << "POLLHUP" << std::endl;
+							buffer[5] = '\0';
+							std::string message(buffer);
+							std::cout << "1 - ======> HERE" << std::endl;
+							std::cout << "message: " << message << std::endl;
+							std::cout << "client disconnected: " << ClientsMap[_pfds[i].fd].getNickname() << std::endl;
+							std::cout << "buffer: [" << buffer << "]" << std::endl;
+							std::cout << "1 - ======> HERE" << std::endl;
+							ClientsMap.erase(_pfds[i].fd);
+							close(_pfds[i].fd);
+							_pfds[i].fd = -1;
+							_pfds[i].events = 0;
+							_pfds[i].revents = 0;
+							// clients_numbers--;
+						}
+					} else if (readed >= 0) {
+						std::string ss(buffer);
+						if (ss.find("QUIT") != std::string::npos) {
+							std::cout << "==> QUIT" << std::endl;
+							ss = ss.substr(0, ss.find("QUIT"));
+							std::cout << "ss: [" << ss << "]" << std::endl;
+						}
+						buffer[readed] = '\0';
 						std::cout << "2 - ======> HERE" << std::endl;
-						std::cout << "\n==> received: " << buffer << std::endl;
+						std::cout << "\n==> received: [" << buffer << "]" << std::endl;
 						std::string message(buffer);
 						//Command
 						size_t pos = message.find(" ");
@@ -294,10 +333,26 @@ public:
 							send(_pfds[i].fd, response.c_str(), response.length(), 0);
 						}
 					}
-				}
+					// _pfds[i].revents = 0;
+					// _pfds[i].events = POLLIN;
+				} 
+				// else if (_pfds[i].revents & POLLHUP) {
+				// 	char buffer[1024];
+				// 	int readed = recv(_pfds[i].fd, buffer, 1024, 0);
+				// 	std::cout << "readed: " << readed << std::endl;
+				// 	buffer[readed] = '\0';
+				// 	std::cout << "buffer: [" << buffer << "]" << std::endl;
+				// 	std::cout << "XX ==> client disconnected: " << ClientsMap[_pfds[i].fd].getNickname() << std::endl;
+				// 	ClientsMap.erase(_pfds[i].fd);
+				// 	close(_pfds[i].fd);
+				// 	_pfds[i].fd = -1;
+				// 	_pfds[i].events = 0;
+				// 	_pfds[i].revents = 0;
+				// 	clients_numbers--;
+				// }
 			}
 		}
-	}
-};
+	} // startServer
+}; // class Server
 
 #endif

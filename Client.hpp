@@ -14,6 +14,7 @@
 #include <netdb.h>
 #include <fcntl.h>
 #include <map>
+#include <arpa/inet.h>
 class Client
 {
 private:
@@ -22,6 +23,7 @@ private:
     std::string userName;
     bool isAutonticated;
 	std::vector<std::string> commandList;
+	char _client_ip[INET_ADDRSTRLEN];
 public:
     void setPollfd(struct pollfd _pFd)
     {
@@ -47,6 +49,10 @@ public:
     {
         return isAutonticated;
     }
+	void setClientIp(char* ip)
+	{
+		strcpy(_client_ip, ip);
+	}
     void setIsAutonticated()
     {
         if(nickName.length() > 0 && userName.length() > 0)
