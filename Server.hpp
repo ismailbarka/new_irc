@@ -126,10 +126,21 @@ public:
 		}
 		std::string nickName = params.substr(0, params.find("\r"));
 		std::cout << "nickName: " << nickName << std::endl;
-		
-		ClientsMap[_pfds[i].fd].setNickname(nickName);
-		ClientsMap[_pfds[i].fd].setIsAutonticated();
-		std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
+		bool check = 1;
+		for (std::map<int, Client>::iterator it = ClientsMap.begin(); it != ClientsMap.end(); it++)
+		{
+			if(it->second.getNickname() == nickName)
+			{
+				check = 0;
+				std::cout << "nick already used\n";
+			}
+		}
+		if(check == 1)
+		{
+			ClientsMap[_pfds[i].fd].setNickname(nickName);
+			ClientsMap[_pfds[i].fd].setIsAutonticated();
+			std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
+		}
 	}
 
 	void handleUserCommand(std::string params, int i)
@@ -149,6 +160,15 @@ public:
 		userName = userName.substr(0, userName.find(" "));
 		userName = userName.substr(userName.find("\n") + 1);
 		std::cout << "userName: " << userName << std::endl;
+		bool check = 1;
+		for (std::map<int, Client>::iterator it = ClientsMap.begin(); it != ClientsMap.end(); it++)
+		{
+			if(it->second.getuserName() == userName)
+			{
+				check = 0;
+				std::cout << "user already used\n";
+			}
+		}
 		ClientsMap[_pfds[i].fd].setuserName(userName);
 		ClientsMap[_pfds[i].fd].setIsAutonticated();
 		std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
