@@ -14,6 +14,7 @@
 #define SERVER_HPP
 
 #include "Client.hpp"
+#include "Channels.hpp"
 
 #include <iostream>
 #include <sys/poll.h>
@@ -125,6 +126,7 @@ public:
 		}
 		std::string nickName = params.substr(0, params.find("\r"));
 		std::cout << "nickName: " << nickName << std::endl;
+		
 		ClientsMap[_pfds[i].fd].setNickname(nickName);
 		ClientsMap[_pfds[i].fd].setIsAutonticated();
 		std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
@@ -152,6 +154,32 @@ public:
 		std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
 	}
 
+	void handleJoinCommand(std::string params, int i, std::map<std::string,Channels> &channelsV,struct pollfd _pfds[])
+	{
+		(void)i;
+		(void)channelsV;
+		params = trimString(params);
+		if(params.empty() || params[0] != '#')
+		{
+			std::cout << "Invalid channel name" << std::endl;
+			return;
+		}
+		std::map<std::string,Channels>::iterator it = channelsV.find(params);
+		if(it == channelsV.end())
+		{
+			std::cout << "no Cannel with this name need to create one \n";
+			Channels newChannel;
+			newChannel.addClient(_pfds[i].fd);
+			channelsV[params] = newChannel;
+		}
+		else
+		{
+			std::cout << "there is channel, need to add the client to it \n";
+			it->second.addClient(_pfds[i].fd);
+		}
+
+	}
+
 	void handleListCommand(int i, int clients_numbers)
 	{
 		std::map<int, Client>::iterator it;
@@ -166,6 +194,7 @@ public:
 			}
 		}
 	}
+	
 
 	void handleQuitCommand(int i, int & clients_numbers)
 	{
@@ -178,22 +207,39 @@ public:
 		clients_numbers--;
 	}
 
-	void handlePrivMsg(std::string params, int i)
+	void handlePrivMsg(std::string params, int i, std::map<std::string,Channels> &channelsV)
 	{
 		std::string target = params.substr(0, params.find(" "));
 		std::string message = params.substr(params.find(" ") + 1);
 		std::cout << "target: " << target << std::endl;
 		std::cout << "message: " << message << std::endl;
 		if (target[0] == '#') {
-			std::map<int, Client>::iterator it;
-			for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
-				if (it->second.getIsAutonticated() && it->second.getNickname() != ClientsMap[_pfds[i].fd].getNickname()) {
-					//irc message format
-					std::string response = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PRIVMSG " + target + " :" + message + "\n";
-					std::cout << "response: " << response << std::endl;
-					send(it->first, response.c_str(), response.length(), 0);
-				}
+			std::map<std::string,Channels>::iterator it = channelsV.find(target);
+			if(it == channelsV.end())
+			{
+				std::cout << "no channel with this name\n";
+				return ;
 			}
+			else
+			{
+				std::vector<int> clientFds = it->second.getClientFd();
+				std::vector<int>::iterator it1 = clientFds.begin();
+				while (it1 != clientFds.end())
+				{
+					send(*it1, message.c_str(), strlen(message.c_str()), 0);
+					it1++;
+				}
+
+			}
+			// std::map<int, Client>::iterator it;
+			// for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
+			// 	if (it->second.getIsAutonticated() && it->second.getNickname() != ClientsMap[_pfds[i].fd].getNickname()) {
+			// 		//irc message format
+			// 		std::string response = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PRIVMSG " + target + " :" + message + "\n";
+			// 		std::cout << "response: " << response << std::endl;
+			// 		send(it->first, response.c_str(), response.length(), 0);
+			// 	}
+			// }
 		} else {
 			std::map<int, Client>::iterator it;
 			for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
@@ -221,6 +267,7 @@ public:
 		bindSocket();
 		listenSocket();
 		setPollfd();
+		std::map<std::string,Channels> channelsV;
 		int clients_numbers = 1;
 		while (1)
 		{
@@ -247,7 +294,7 @@ public:
 				client.fd = clientSocket;
 				client.events = POLLIN;
 				client.revents = 0;
-				inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN);
+				inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN); // ?
 				std::cout << "client ip: " << client_ip << std::endl;
 				setPollfd(client, clients_numbers);
 				Client newClient(client);
@@ -324,9 +371,11 @@ public:
 						} else if (command == "QUIT\n" || command == "QUIT") {
 							handleQuitCommand(i, clients_numbers);
 						} else if (command == "PRIVMSG") {
-							handlePrivMsg(params, i);
+							handlePrivMsg(params, i,channelsV);
 						} else if (command == "LIST" || command == "LIST\n") {
 							handleListCommand(i, clients_numbers);
+						} else if(command == "JOIN" || command == "JOIN\n"){
+							handleJoinCommand(params, i, channelsV, _pfds);
 						} else {
 							std::string response = command.substr(0, command.find("\n")) + " " + "Unknown command" + "\n";
 							std::cout << "response: " << response << std::endl;
