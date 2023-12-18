@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/17 18:01:49 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/18 18:49:06 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <arpa/inet.h>
 
+
 class Client;
 class Server
 {
@@ -44,10 +45,12 @@ private:
 	std::string userName;
 	// bool isAutonticated;
 	std::vector<std::string> commandList;
-	struct sockaddr_in server_adr;
+	struct sockaddr_in server_addr;
 	std::map<int, Client> ClientsMap;
+	std::string _password;
 public:
 	Server() {
+		_password = "1234";
 		serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 		if (serverSocket < 0)
 			throw std::exception();
@@ -58,22 +61,21 @@ public:
 		} else {
 			std::cout << "nRet failed\n";
 		}
-		int nFl = fcntl(serverSocket, F_GETFL, 0);
-		nFl |= O_NONBLOCK;
-		nFl = fcntl(serverSocket, F_SETFL, nFl);
+		int nFl = fcntl(serverSocket, F_SETFL, O_NONBLOCK);
 		if (nFl < 0) {
 			std::cout << "failed to set socket to non-blocking mode\n";
 		} else {
 			std::cout << "socket to non-blocking mode\n";
 		}
-		memset(&server_adr, '\0', sizeof(server_adr));
-		server_adr.sin_family = AF_INET;
-		server_adr.sin_port = htons(5000);
+		memset(&server_addr, '\0', sizeof(server_addr));
+		server_addr.sin_family = AF_INET;
+		server_addr.sin_addr.s_addr = htons(INADDR_ANY);
+		server_addr.sin_port = htons(5000);
 	}
 
 	void bindSocket()
 	{
-		int bCheck = bind(serverSocket, (struct sockaddr *)&server_adr, sizeof(server_adr));
+		int bCheck = bind(serverSocket, (struct sockaddr *)&server_addr, sizeof(server_addr));
 		if (bCheck < 0)
 			throw std::exception();
 	}
@@ -121,7 +123,9 @@ public:
 			return;
 		}
 		if (ClientsMap.find(_pfds[i].fd) != ClientsMap.end() && ClientsMap[_pfds[i].fd].getIsAutonticated()) {
-			std::cout << "client already authenticated" << std::endl;
+			std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :You are already registered with a nickname\n";
+			std::cout << "response: " << response << std::endl;
+			send(_pfds[i].fd, response.c_str(), response.length(), 0);
 			return;
 		}
 		std::string nickName = params.substr(0, params.find("\r"));
@@ -135,11 +139,17 @@ public:
 				std::cout << "nick already used\n";
 			}
 		}
-		if(check == 1)
+		if (check == 1)
 		{
 			ClientsMap[_pfds[i].fd].setNickname(nickName);
 			ClientsMap[_pfds[i].fd].setIsAutonticated();
 			std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
+			if (ClientsMap[_pfds[i].fd].getIsAutonticated())
+			{
+				std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Welcome to the Internet Relay Network " + ClientsMap[_pfds[i].fd].getNickname() + "\n";
+				std::cout << "response: " << response << std::endl;
+				send(_pfds[i].fd, response.c_str(), response.length(), 0);
+			}
 		}
 	}
 
@@ -152,7 +162,9 @@ public:
 			return;
 		}
 		if (ClientsMap.find(_pfds[i].fd) != ClientsMap.end() && ClientsMap[_pfds[i].fd].getIsAutonticated()) {
-			std::cout << "client already authenticated" << std::endl;
+			std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :You are already registered with a username\n";
+			std::cout << "response: " << response << std::endl;
+			send(_pfds[i].fd, response.c_str(), response.length(), 0);
 			return;
 		}
 		std::string userName = params.substr(0, params.find(" "));
@@ -163,7 +175,7 @@ public:
 		bool check = 1;
 		for (std::map<int, Client>::iterator it = ClientsMap.begin(); it != ClientsMap.end(); it++)
 		{
-			if(it->second.getuserName() == userName)
+			if (it->second.getUserName() == userName)
 			{
 				check = 0;
 				std::cout << "user already used\n";
@@ -172,6 +184,12 @@ public:
 		ClientsMap[_pfds[i].fd].setuserName(userName);
 		ClientsMap[_pfds[i].fd].setIsAutonticated();
 		std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
+		if (ClientsMap[_pfds[i].fd].getIsAutonticated())
+		{
+			std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Welcome to the Internet Relay Network " + ClientsMap[_pfds[i].fd].getNickname() + "\n";
+			std::cout << "response: " << response << std::endl;
+			send(_pfds[i].fd, response.c_str(), response.length(), 0);
+		}
 	}
 
 	void handleJoinCommand(std::string params, int i, std::map<std::string,Channels> &channelsV,struct pollfd _pfds[])
@@ -207,8 +225,8 @@ public:
 		for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
 			if (it->second.getIsAutonticated()) {
 				std::string res = "[" + std::to_string(it->second.getfd());
-				res += "] [" + it->second.getNickname() + "]\n";
-				std::string response = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PRIVMSG " + ClientsMap[_pfds[i].fd].getNickname() + " :" + res + "\n";
+				res += "] [" + it->second.getNickname() + "] [ " + it->second.getUserName() + " ]\n";
+				std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + ": " + res + "\n";
 				std::cout << "response: " << response;
 				send(_pfds[i].fd, response.c_str(), response.length(), 0);
 			}
@@ -218,6 +236,9 @@ public:
 
 	void handleQuitCommand(int i, int & clients_numbers)
 	{
+		std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Bye Bye " + ClientsMap[_pfds[i].fd].getNickname() + "\n";
+		std::cout << "response: " << response << std::endl;
+		send(_pfds[i].fd, response.c_str(), response.length(), 0);
 		std::cout << "client disconnected: " << ClientsMap[_pfds[i].fd].getNickname() << std::endl;
 		ClientsMap.erase(_pfds[i].fd);
 		close(_pfds[i].fd);
@@ -235,7 +256,7 @@ public:
 		std::cout << "message: " << message << std::endl;
 		if (target[0] == '#') {
 			std::map<std::string,Channels>::iterator it = channelsV.find(target);
-			if(it == channelsV.end())
+			if (it == channelsV.end())
 			{
 				std::cout << "no channel with this name\n";
 				return ;
@@ -251,15 +272,6 @@ public:
 				}
 
 			}
-			// std::map<int, Client>::iterator it;
-			// for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
-			// 	if (it->second.getIsAutonticated() && it->second.getNickname() != ClientsMap[_pfds[i].fd].getNickname()) {
-			// 		//irc message format
-			// 		std::string response = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PRIVMSG " + target + " :" + message + "\n";
-			// 		std::cout << "response: " << response << std::endl;
-			// 		send(it->first, response.c_str(), response.length(), 0);
-			// 	}
-			// }
 		} else {
 			std::map<int, Client>::iterator it;
 			for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
@@ -312,7 +324,7 @@ public:
 				}
 				struct pollfd client;
 				client.fd = clientSocket;
-				client.events = POLLIN;
+				client.events = POLLIN | POLLHUP;
 				client.revents = 0;
 				inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN); // ?
 				std::cout << "client ip: " << client_ip << std::endl;
@@ -321,36 +333,32 @@ public:
 				newClient.setClientIp(client_ip);
 				ClientsMap.insert(std::pair<int, Client>(clientSocket, newClient));
 				clients_numbers++;
+				//check if is autonticated
 			}
 			//Grap diconnected clients
 			for (int i = 1; i < clients_numbers; i++) {
 				if (_pfds[i].revents & POLLIN) {
+					//send welcome message only once
+					if (ClientsMap[_pfds[i].fd].getNickname().empty() && ClientsMap[_pfds[i].fd].getUserName().empty() && ClientsMap[_pfds[i].fd].getCorrectPassWord() == false) {
+						std::string response = "001 visitor :Welcome to our IRC server, please enter nickname, username and password\n";
+						std::cout << "response: " << response << std::endl;
+						send(_pfds[i].fd, response.c_str(), response.length(), 0);
+					}
 					char buffer[1024];
 					memset(buffer, 0, sizeof(buffer));
-					size_t readed = recv(_pfds[i].fd, buffer, sizeof(buffer), 0);
+					int readed = recv(_pfds[i].fd, buffer, 1024, 0);
 					buffer[readed] = '\0';
-					std::cout << "xxxxxxxx> buffer: [" << buffer << "]" << std::endl;
 					if (readed < 0) {
-						std::cout << "0 - ======> HERE" << std::endl;
 						throw std::exception();
 					} else if (readed == 0) {
-						std::string ss(buffer);
-						if (ss.find("QUIT") != std::string::npos) {
-							std::cout << "==> QUIT" << std::endl;
-							ss = ss.substr(0, ss.find("QUIT"));
-							std::cout << "ss: [" << ss << "]" << std::endl;
-						}
-						//get message from client
 						if (_pfds[i].revents & POLLHUP)
 						{
 							std::cout << "POLLHUP" << std::endl;
 							buffer[5] = '\0';
 							std::string message(buffer);
-							std::cout << "1 - ======> HERE" << std::endl;
 							std::cout << "message: " << message << std::endl;
 							std::cout << "client disconnected: " << ClientsMap[_pfds[i].fd].getNickname() << std::endl;
 							std::cout << "buffer: [" << buffer << "]" << std::endl;
-							std::cout << "1 - ======> HERE" << std::endl;
 							ClientsMap.erase(_pfds[i].fd);
 							close(_pfds[i].fd);
 							_pfds[i].fd = -1;
@@ -359,14 +367,7 @@ public:
 							// clients_numbers--;
 						}
 					} else if (readed >= 0) {
-						std::string ss(buffer);
-						if (ss.find("QUIT") != std::string::npos) {
-							std::cout << "==> QUIT" << std::endl;
-							ss = ss.substr(0, ss.find("QUIT"));
-							std::cout << "ss: [" << ss << "]" << std::endl;
-						}
 						buffer[readed] = '\0';
-						std::cout << "2 - ======> HERE" << std::endl;
 						std::cout << "\n==> received: [" << buffer << "]" << std::endl;
 						std::string message(buffer);
 						//Command
@@ -384,44 +385,63 @@ public:
 						std::cout << "command: [" << command << "]" << std::endl;
 						std::cout << "params: [" << params << "]" << std::endl;
 						// split params userName 0 * NickName
-						if (command == "NICK") {
+						if ((command == "PASS" || command == "PASS\n") && !ClientsMap[_pfds[i].fd].getIsAutonticated()) {
+							std::string password = params.substr(0, params.find("\r"));
+							std::cout << "password: " << password << std::endl;
+							if (password == _password) {
+								ClientsMap[_pfds[i].fd].setCorrectPassWord(true);
+								ClientsMap[_pfds[i].fd].setIsAutonticated();
+								if (ClientsMap[_pfds[i].fd].getIsAutonticated())
+								{
+									std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Welcome to the Internet Relay Network " + ClientsMap[_pfds[i].fd].getNickname() + "\n";
+									std::cout << "response: " << response << std::endl;
+									send(_pfds[i].fd, response.c_str(), response.length(), 0);
+								}
+							} else {
+								std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Password incorrect\n";
+								std::cout << "response: " << response << std::endl;
+								send(_pfds[i].fd, response.c_str(), response.length(), 0);
+							}
+						}
+						else if (command == "NICK") {
 							handleNickCommand(params, i);
 						} else if (command == "USER") {
 							handleUserCommand(params, i);
 						} else if (command == "QUIT\n" || command == "QUIT") {
 							handleQuitCommand(i, clients_numbers);
-						} else if (command == "PRIVMSG") {
-							handlePrivMsg(params, i,channelsV);
-						} else if (command == "LIST" || command == "LIST\n") {
-							handleListCommand(i, clients_numbers);
-						} else if(command == "JOIN" || command == "JOIN\n"){
-							handleJoinCommand(params, i, channelsV, _pfds);
+						} 
+						else if (ClientsMap[_pfds[i].fd].getIsAutonticated())
+						{
+							if (command == "PASS" || command == "PASS\n") {
+								std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :You are already registered with a password\n";
+								std::cout << "response: " << response << std::endl;
+								send(_pfds[i].fd, response.c_str(), response.length(), 0);
+								return;
+							} else if (command == "PRIVMSG") {
+								handlePrivMsg(params, i,channelsV);
+							} else if (command == "LIST" || command == "LIST\n") {
+								handleListCommand(i, clients_numbers);
+							} else if (command == "JOIN" || command == "JOIN\n") {
+								handleJoinCommand(params, i, channelsV, _pfds);
+							} else if (command == "GET") {
+								std::string response = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n<html><body><h1>Hello, Welcome to my web server!</h1></body></html>\n";
+								std::cout << "response: " << response << std::endl;
+								send(_pfds[i].fd, response.c_str(), response.length(), 0);
+							} else {
+								std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Unknown command: " + command + "\n";
+								std::cout << "response: " << response << std::endl;
+								send(_pfds[i].fd, response.c_str(), response.length(), 0);
+							}
 						} else {
-							std::string response = command.substr(0, command.find("\n")) + " " + "Unknown command" + "\n";
+							std::string response = "001 visitor :you need to be autonticated first\n";
 							std::cout << "response: " << response << std::endl;
 							send(_pfds[i].fd, response.c_str(), response.length(), 0);
 						}
 					}
-					// _pfds[i].revents = 0;
-					// _pfds[i].events = POLLIN;
-				} 
-				// else if (_pfds[i].revents & POLLHUP) {
-				// 	char buffer[1024];
-				// 	int readed = recv(_pfds[i].fd, buffer, 1024, 0);
-				// 	std::cout << "readed: " << readed << std::endl;
-				// 	buffer[readed] = '\0';
-				// 	std::cout << "buffer: [" << buffer << "]" << std::endl;
-				// 	std::cout << "XX ==> client disconnected: " << ClientsMap[_pfds[i].fd].getNickname() << std::endl;
-				// 	ClientsMap.erase(_pfds[i].fd);
-				// 	close(_pfds[i].fd);
-				// 	_pfds[i].fd = -1;
-				// 	_pfds[i].events = 0;
-				// 	_pfds[i].revents = 0;
-				// 	clients_numbers--;
-				// }
+				}
 			}
 		}
-	} // startServer
-}; // class Server
+	}
+};
 
 #endif

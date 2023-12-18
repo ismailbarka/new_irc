@@ -23,6 +23,7 @@ private:
     std::string userName;
     bool isAutonticated;
 	std::vector<std::string> commandList;
+	bool correctPassword;
 	char _client_ip[INET_ADDRSTRLEN];
 public:
     void setPollfd(struct pollfd _pFd)
@@ -41,7 +42,7 @@ public:
     {
         return nickName;
     }
-    std::string getuserName()
+    std::string getUserName()
     {
         return userName;
     }
@@ -55,11 +56,17 @@ public:
 	}
     void setIsAutonticated()
     {
-        if(nickName.length() > 0 && userName.length() > 0)
+        if (nickName.length() > 0 && userName.length() > 0 && correctPassword == true)
             isAutonticated = true;
     }
 	int getfd(){
 		return pFd.fd;
+	}
+	void setCorrectPassWord(bool _correctPassword){
+		correctPassword = _correctPassword;
+	}
+	bool getCorrectPassWord(){
+		return correctPassword;
 	}
     Client();
     Client(struct pollfd client)
@@ -68,6 +75,7 @@ public:
         nickName = "";
         userName = "";
         isAutonticated = false;
+		correctPassword = false;
 		fillCommandList();
     }
 	void fillCommandList()
