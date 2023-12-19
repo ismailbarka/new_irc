@@ -24,7 +24,6 @@ int main(int ac, char **av)
 	{
 
 		Server server(av);
-
 		server.startServer();
 	}
 	catch(const std::exception& e)
