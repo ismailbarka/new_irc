@@ -49,8 +49,8 @@ private:
 	std::map<int, Client> ClientsMap;
 	std::string _password;
 public:
-	Server() {
-		_password = "1234";
+	Server(char **av) {
+		_password = av[2];
 		serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 		if (serverSocket < 0)
 			throw std::exception();
@@ -70,7 +70,7 @@ public:
 		memset(&server_addr, '\0', sizeof(server_addr));
 		server_addr.sin_family = AF_INET;
 		server_addr.sin_addr.s_addr = htons(INADDR_ANY);
-		server_addr.sin_port = htons(5000);
+		server_addr.sin_port = htons(std::atoi(av[1]));
 	}
 
 	void bindSocket()
@@ -267,7 +267,9 @@ public:
 				std::vector<int>::iterator it1 = clientFds.begin();
 				while (it1 != clientFds.end())
 				{
-					send(*it1, message.c_str(), strlen(message.c_str()), 0);
+					std::map<int, Client>::iterator itt = ClientsMap.find(*it1);
+					if(itt->second.getIsAutonticated() == true)
+						send(*it1, message.c_str(), strlen(message.c_str()), 0);
 					it1++;
 				}
 
