@@ -25,6 +25,7 @@ private:
 	std::vector<std::string> commandList;
 	bool correctPassword;
 	char _client_ip[INET_ADDRSTRLEN];
+	std::string _client_host;
 public:
     void setPollfd(struct pollfd _pFd)
     {
@@ -74,10 +75,17 @@ public:
         pFd = client;
         nickName = "";
         userName = "";
+		_client_host = "";
         isAutonticated = false;
 		correctPassword = false;
 		fillCommandList();
     }
+	std::string getClientHost() const {
+		return _client_host;
+	}
+	void setClientHost(std::string host) {
+		_client_host = host;
+	}
 	void fillCommandList()
 	{
 		commandList.push_back("USER");
