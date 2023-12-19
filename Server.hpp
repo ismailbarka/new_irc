@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/19 16:29:44 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/19 18:14:46 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -261,7 +261,7 @@ public:
 	void handleJoinCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[])
 	{
 		params = trimString(params);
-		if (params.empty() || params[0] != '#' || (params[0] == '#' && params[1] && !isalnum(params[1])))
+		if (params.empty() || params[0] != '#' || (params[0] == '#' && params[1] && !isalnum(params[1])) || (params[0] == '#' && !params[1]))
 		{
 			std::string resp = "ERROR Invalid channel name: " + params + "\n";
 			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
@@ -270,7 +270,7 @@ public:
 		std::map<std::string,Channels>::iterator it = channelsV.find(params);
 		if (it == channelsV.end())
 		{
-			std::string resp = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have sucssefully CREATED and JOINED " + params + "\n";
+			std::string resp = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have successfully CREATED and JOINED " + params + "\n";
 			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 			Channels newChannel;
 			newChannel.addClient(_pfds[i].fd);
@@ -330,43 +330,59 @@ public:
 		std::string target = params.substr(0, params.find(" "));
 		std::string message = params.substr(params.find(" ") + 1);
 		message = message.substr(message.find(":") + 1);
+		std::cout << "------PRIVMSG------" << std::endl;
 		std::cout << "sender: " << sender << std::endl;
 		std::cout << "target: " << target << std::endl;
 		std::cout << "message: " << message << std::endl;
-		if (target[0] == '#') {
+		if (target[0] == '#') { //channel messages
 			std::map<std::string,Channels>::iterator it = channelsV.find(target);
 			if (it == channelsV.end())
 			{
-				std::cout << "no channel with this name\n";
-				return ;
+				std::string resp = "ERROR NO CHANNEL WITH THIS NAME [" + target.substr(target.find("#") + 1) + "]\n";
+				resp += "ERROR YOU NEED TO CREATE/JOIN THIS CHANNEL FIRST\n";
+				std::cout << "response: " << resp;
+				if (send(_pfds[i].fd, resp.c_str(), resp.length(), 0) == -1)
+					throw sendException();
 			} else {
+				//check if the client is not in the channel
+				std::vector<int>::iterator it1 = it->second.getClientsFd().begin();
+				while (it1 != it->second.getClientsFd().end() && *it1 != _pfds[i].fd)
+					it1++;
+				if (it1 == it->second.getClientsFd().end())
+				{
+					std::string resp = "ERROR YOU ARE NOT IN THIS CHANNEL [" + target.substr(target.find("#") + 1) + "]\n";
+					std::cout << "response: " << resp;
+					if (send(_pfds[i].fd, resp.c_str(), resp.length(), 0) == -1)
+						throw sendException();
+					return;
+				}
 				std::vector<int> clientFds = it->second.getClientFd();
-				std::vector<int>::iterator it1 = clientFds.begin();
+				it1 = clientFds.begin();
 				while (it1 != clientFds.end())
 				{
 					std::map<int, Client>::iterator itt = ClientsMap.find(*it1);
 					if (itt->second.getIsAutonticated() == true && itt->second.getNickname() != sender) {
-						std::string resp = ":" + sender + " PRIVMSG " + target + " " + message + "\n";
-						if (send(*it1, resp.c_str(), strlen(resp.c_str()), 0) == -1)
+						std::string resp = ":" + sender + " PRIVMSG " + target + " :" + message + "\n";
+						std::cout << "response: " << resp << std::endl;
+						if (send(*it1, resp.c_str(), resp.length(), 0) == -1)
 							throw sendException();
 					}
 					it1++;
 				}
 			}
-		} else {
+		} else { //private messages
 			std::map<int, Client>::iterator it;
 			for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
 				if (it->second.getIsAutonticated() && it->second.getNickname() == target) {
 					std::string response = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PRIVMSG " + target + " :" + message + "\n";
 					std::cout << "response: " << response << std::endl;
-					
 					if (send(it->first, response.c_str(), response.length(), 0) == -1)
 						throw sendException();
-					break;
+					break ;
 				}
 			}
 			if (it == ClientsMap.end()) {
-				std::string response = "Error sending messgae, no such nick: [ " + target + " ]\n";
+				std::string response = "Error  Error sending messgae, no such nick: [ " + target + " ]\n";
 				std::cout << "response: " << response << std::endl;
 				send(_pfds[i].fd, response.c_str(), response.length(), 0);
 			}
@@ -483,20 +499,13 @@ public:
 							std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :PING\n";
 							std::cout << "response: " << response << std::endl;
 							send(_pfds[i].fd, response.c_str(), response.length(), 0);
-						}
-						else if (command == "NICK") {
+						} else if (command == "NICK") {
 							handleNickCommand(params, i);
 						} else if (command == "USER") {
 							handleUserCommand(params, i);
 						} else if (command == "QUIT\n" || command == "QUIT") {
 							handleQuitCommand(i, clients_numbers);
-						} else if (command == "GET") {
-								std::string response = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n<html><body><h1>Hello, Welcome to my web server!</h1></body></html>\n";
-								std::cout << "response: " << response << std::endl;
-								send(_pfds[i].fd, response.c_str(), response.length(), 0);
-						}
-						else if (ClientsMap[_pfds[i].fd].getIsAutonticated())
-						{
+						} else if (ClientsMap[_pfds[i].fd].getIsAutonticated()) {
 							if (command == "PASS" || command == "PASS\n") {
 								std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": You are already registered with a password\n";
 								std::cout << "response: " << response << std::endl;
