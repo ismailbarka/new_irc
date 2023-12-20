@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/20 16:29:42 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/20 18:10:16 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,6 +290,7 @@ public:
 			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 			Channels newChannel;
 			newChannel.addClient(_pfds[i].fd);
+			newChannel.setMode("o");
 			channelsV[channel] = newChannel;
 		}
 		else
@@ -297,7 +298,7 @@ public:
 			std::vector<int>::iterator it1 = it->second.getClientsFd().begin();
 			while (it1 != it->second.getClientsFd().end() && *it1 != _pfds[i].fd)
 				it1++;
-			if (it1 != it->second.getClientsFd().end())
+			if (*it1 == _pfds[i].fd)
 			{
 				std::string resp = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + " You have already JOINED " + params + "\n";
 				send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
@@ -419,6 +420,12 @@ public:
 		mode = mode.substr(0, mode.find("\r"));
 		std::cout << "channelName: " << channelName << std::endl;
 		std::cout << "mode: " << mode << std::endl;
+		if (mode != "i+" && mode != "i-" && mode != "t+" && mode != "t-" && mode != "k+" && mode != "k-" && mode != "o+" && mode != "o-" && mode != "l+" && mode != "l-")
+		{
+			std::string resp = "ERROR Invalid mode: " + mode + "\n";
+			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
+			return;
+		}
 		std::map<std::string,Channels>::iterator it = channelsV.find(channelName);
 		if (it != channelsV.end())
 		{
@@ -428,6 +435,8 @@ public:
 			if (it1 != it->second.getClientsFd().end())
 			{
 				std::string resp = "MODE " + channelName + " " + mode + "\n";
+				//set channel mode
+				it->second.setMode(mode);
 				std::cout << "response: " << resp;
 				send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 			} else {

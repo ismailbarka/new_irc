@@ -6,6 +6,7 @@ class Channels
 {
 private:
     std::vector<int> clientsFd;
+	std::string mode;
 public:
     Channels(/* args */);
     ~Channels();
@@ -24,6 +25,14 @@ public:
 	std::vector<int>  & getClientsFd()
 	{
 		return clientsFd;
+	}
+	void setMode(std::string _mode)
+	{
+		mode = _mode;
+	}
+	std::string getMode()
+	{
+		return mode;
 	}
 };
 
