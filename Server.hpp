@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/19 18:14:46 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/20 16:29:42 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,18 @@ public:
 		return str.substr(start, end - start);
 	}
 
+	void welcomeMessage(int i)
+	{
+		if (ClientsMap[_pfds[i].fd].getIsAutonticated())
+		{
+			std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Welcome to the Internet Relay Network\n";
+			response += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You are now logged in as [ " + ClientsMap[_pfds[i].fd].getNickname() + " ]\n";
+			// response += "002 " + ClientsMap[_pfds[i].fd].getNickname() + " :your host is " + std::string(hostname) + ", running version 1.0\n";
+			std::cout << "response: " << response << std::endl;
+			send(_pfds[i].fd, response.c_str(), response.length(), 0);
+		}
+	}
+
 	void handleNickCommand(std::string params, int i)
 	{
 		params = trimString(params);
@@ -205,18 +217,20 @@ public:
 			ClientsMap[_pfds[i].fd].setNickname(nickName);
 			ClientsMap[_pfds[i].fd].setIsAutonticated();
 			std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
-			if (ClientsMap[_pfds[i].fd].getIsAutonticated())
-			{
-				std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Welcome to the Internet Relay Network " + ClientsMap[_pfds[i].fd].getNickname() + "\n";
-				std::cout << "response: " << response << std::endl;
-				send(_pfds[i].fd, response.c_str(), response.length(), 0);
-			}
+			welcomeMessage(i);
 		}
 	}
 
 	void handleUserCommand(std::string params, int i)
 	{
 		params = trimString(params);
+		if (ClientsMap[_pfds[i].fd].getNickname().empty())
+		{
+			std::string response = "ERROR you need to set a nickname first\n";
+			std::cout << "response: " << response << std::endl;
+			send(_pfds[i].fd, response.c_str(), response.length(), 0);
+			return;
+		}
 		if (params.empty())
 		{
 			std::cout << "Invalid UserName" << std::endl;
@@ -249,17 +263,13 @@ public:
 			ClientsMap[_pfds[i].fd].setuserName(userName);
 			ClientsMap[_pfds[i].fd].setIsAutonticated();
 			std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
-			if (ClientsMap[_pfds[i].fd].getIsAutonticated())
-			{
-				std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Welcome to the Internet Relay Network " + ClientsMap[_pfds[i].fd].getNickname() + "\n";
-				std::cout << "response: " << response << std::endl;
-				send(_pfds[i].fd, response.c_str(), response.length(), 0);
-			}
+			welcomeMessage(i);
 		}
 	}
 
 	void handleJoinCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[])
 	{
+		std::string channel = params.substr(0, params.find(" "));
 		params = trimString(params);
 		if (params.empty() || params[0] != '#' || (params[0] == '#' && params[1] && !isalnum(params[1])) || (params[0] == '#' && !params[1]))
 		{
@@ -267,14 +277,20 @@ public:
 			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 			return;
 		}
-		std::map<std::string,Channels>::iterator it = channelsV.find(params);
+		std::map<std::string,Channels>::iterator it = channelsV.find(channel);
 		if (it == channelsV.end())
 		{
-			std::string resp = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have successfully CREATED and JOINED " + params + "\n";
+			// params = channel;
+			std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + " JOIN " + params + "\n";
+			resp += "332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + params + "\n";
+			// resp += "353 " + ClientsMap[_pfds[i].fd].getNickname() + " = " + params + " :" + ClientsMap[_pfds[i].fd].getNickname() + "\n";
+			// resp += "366 " + ClientsMap[_pfds[i].fd].getNickname() + " " + params + " :End of NAMES list\n";
+			resp += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have successfully CREATED and JOINED " + params + "\n";
+			std::cout << "response: " << resp;
 			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 			Channels newChannel;
 			newChannel.addClient(_pfds[i].fd);
-			channelsV[params] = newChannel;
+			channelsV[channel] = newChannel;
 		}
 		else
 		{
@@ -283,11 +299,12 @@ public:
 				it1++;
 			if (it1 != it->second.getClientsFd().end())
 			{
-				std::string resp = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have already JOINED " + params + "\n";
+				std::string resp = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + " You have already JOINED " + params + "\n";
 				send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 				return;
 			} else {
-				std::string resp = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have sucssefully JOINED " + params + "\n";
+				std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + " JOIN " + params + "\n";
+				resp += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have sucssefully JOINED " + params + "\n";
 				send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 				it->second.addClient(_pfds[i].fd);
 			}
@@ -302,7 +319,7 @@ public:
 			if (it->second.getIsAutonticated()) {
 				std::string res = "[" + std::to_string(it->second.getfd());
 				res += "] [" + it->second.getNickname() + "] [ " + it->second.getUserName() + " ]\n";
-				std::string response = "251 * :" + res + "\n";
+				std::string response = "393 "+ ClientsMap[_pfds[i].fd].getNickname() + res + "\n";
 				std::cout << "response: " << response;
 				send(_pfds[i].fd, response.c_str(), response.length(), 0);
 			}
@@ -338,8 +355,7 @@ public:
 			std::map<std::string,Channels>::iterator it = channelsV.find(target);
 			if (it == channelsV.end())
 			{
-				std::string resp = "ERROR NO CHANNEL WITH THIS NAME [" + target.substr(target.find("#") + 1) + "]\n";
-				resp += "ERROR YOU NEED TO CREATE/JOIN THIS CHANNEL FIRST\n";
+				std::string resp = "403 " + ClientsMap[_pfds[i].fd].getNickname() + " :YOU NEED TO CREATE/JOIN THIS CHANNEL FIRST: " + target + "\n";
 				std::cout << "response: " << resp;
 				if (send(_pfds[i].fd, resp.c_str(), resp.length(), 0) == -1)
 					throw sendException();
@@ -389,6 +405,44 @@ public:
 		}
 	}
 
+	void handleModeCommand(std::string params,int i,std::map<std::string, Channels> & channelsV)
+	{
+		if (params.empty())
+		{
+			std::string resp = "ERROR Invalid channel name: " + params + "\n";
+			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
+			return;
+		}
+		std::string channelName = params.substr(0, params.find(" "));
+		std::string mode = params.substr(params.find(" ") + 1);
+		mode = mode.substr(mode.find(" ") + 1);
+		mode = mode.substr(0, mode.find("\r"));
+		std::cout << "channelName: " << channelName << std::endl;
+		std::cout << "mode: " << mode << std::endl;
+		std::map<std::string,Channels>::iterator it = channelsV.find(channelName);
+		if (it != channelsV.end())
+		{
+			std::vector<int>::iterator it1 = it->second.getClientsFd().begin();
+			while (it1 != it->second.getClientsFd().end() && *it1 != _pfds[i].fd)
+				it1++;
+			if (it1 != it->second.getClientsFd().end())
+			{
+				std::string resp = "MODE " + channelName + " " + mode + "\n";
+				std::cout << "response: " << resp;
+				send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
+			} else {
+				std::string resp = "ERROR YOU ARE NOT IN THIS CHANNEL [" + channelName.substr(channelName.find("#") + 1) + "]\n";
+				std::cout << "response: " << resp;
+				send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
+			}
+		} else {
+			std::string resp = "ERROR NO CHANNEL WITH THIS NAME [" + channelName.substr(channelName.find("#") + 1) + "]\n";
+			resp += "ERROR YOU NEED TO CREATE/JOIN THIS CHANNEL FIRST\n";
+			std::cout << "response: " << resp;
+			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
+		}
+	}
+
 	void startServer()
 	{
 		bindSocket();
@@ -396,6 +450,7 @@ public:
 		setPollfd();
 		std::map<std::string,Channels> channelsV;
 		int clients_numbers = 1;
+		char hostname[256];
 		while (1)
 		{
 			char client_ip[INET_ADDRSTRLEN];
@@ -423,14 +478,29 @@ public:
 				client.revents = 0;
 				inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN); // ?
 				std::cout << "client ip: " << client_ip << std::endl;
+				//HOSTNAME
+				if (gethostname(hostname, sizeof(hostname)) == 0) {
+					std::cout << "Hostname: " << hostname << std::endl;
+				} else {
+					std::cerr << "Error getting hostname" << std::endl;
+				}
+				//HOSTNAME
 				setPollfd(client, clients_numbers);
 				Client newClient(client);
 				newClient.setClientIp(client_ip);
 				ClientsMap.insert(std::pair<int, Client>(clientSocket, newClient));
 				clients_numbers++;
 				// std::string response = "251 * MG Welcome to our IRC server, please enter nickname, username and password\n";
-				std::string response = ":e2r8p3.1337.ma 251 * :Welcome to the FT_IRC server! Enjoy your chat.\n";
-				send(clientSocket, response.c_str(), response.length(), 0);
+				//mini_irc ascii art
+				std::string art  = "002 * :███╗   ███╗██╗███╗   ██╗██╗        ██╗██████╗  ██████╗ \n";
+							art += "002 * :████╗ ████║██║████╗  ██║██║        ██║██╔══██╗██╔════╝ \n";
+							art += "002 * :██╔████╔██║██║██╔██╗ ██║██║███████╗██║██████╔╝██║      \n";
+							art += "002 * :██║╚██╔╝██║██║██║╚██╗██║██║╚══════╝██║██╔══██╗██║      \n";
+							art += "002 * :██║ ╚═╝ ██║██║██║ ╚████║██║        ██║██║  ██║╚██████╗ \n";
+							art += "002 * :╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝        ╚═╝╚═╝  ╚═╝ ╚═════╝ \n";
+							art += "002 * :[~[ Welcome to the FT_IRC server! Enjoy your chat ]~] \n";
+				std::cout << art << std::endl;
+				send(clientSocket, art.c_str(), art.length(), 0);
 				//check if is autonticated
 			}
 			//Grap diconnected clients
@@ -458,7 +528,7 @@ public:
 							_pfds[i].revents = 0;
 							// clients_numbers--;
 						}
-					} else if (readed >= 0) {
+					} else if (readed > 0) {
 						buffer[readed] = '\0';
 						std::cout << "\n==> received: [" << buffer << "]" << std::endl;
 						std::string message(buffer);
@@ -484,14 +554,9 @@ public:
 							if (password == _password) {
 								ClientsMap[_pfds[i].fd].setCorrectPassWord(true);
 								ClientsMap[_pfds[i].fd].setIsAutonticated();
-								if (ClientsMap[_pfds[i].fd].getIsAutonticated())
-								{
-									std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Welcome to the Internet Relay Network " + ClientsMap[_pfds[i].fd].getNickname() + "\n";
-									std::cout << "response: " << response << std::endl;
-									send(_pfds[i].fd, response.c_str(), response.length(), 0);
-								}
+								welcomeMessage(i);
 							} else {
-								std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Password incorrect\n";
+								std::string response = "464 " + ClientsMap[_pfds[i].fd].getNickname() + " :Password incorrect\n";
 								std::cout << "response: " << response << std::endl;
 								send(_pfds[i].fd, response.c_str(), response.length(), 0);
 							}
@@ -516,8 +581,10 @@ public:
 								handleListCommand(i, clients_numbers);
 							} else if (command == "JOIN" || command == "JOIN\n") {
 								handleJoinCommand(params, i, channelsV, _pfds);
+							} else if (command == "MODE" || command == "MODE\n") {
+								handleModeCommand(params, i, channelsV);
 							} else {
-								std::string response = "ERROR Unknown command: " + command + "\n";
+								std::string response = "421 " + ClientsMap[_pfds[i].fd].getNickname() + " :Unknown command: " + command + "\n";
 								std::cout << "response: " << response << std::endl;
 								send(_pfds[i].fd, response.c_str(), response.length(), 0);
 							}
