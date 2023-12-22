@@ -7,10 +7,17 @@ class Channels
 private:
 public:
     std::vector<int> clientsFd;
+    std::string password;
+    bool havePassword;
     std::string topic;
     Channels()
     {
-        topic = "notopic yet\n";
+        topic = "no topic yet\n";
+    };
+    Channels(bool _havePassword)
+    {
+        havePassword = _havePassword;
+        topic = "no topic yet\n";
     };
     ~Channels();
     void addClient(int _clientFd)
