@@ -5,9 +5,13 @@
 class Channels
 {
 private:
-    std::vector<int> clientsFd;
 public:
-    Channels(/* args */);
+    std::vector<int> clientsFd;
+    std::string topic;
+    Channels()
+    {
+        topic = "notopic yet\n";
+    };
     ~Channels();
     void addClient(int _clientFd)
     {
@@ -26,10 +30,6 @@ public:
 		return clientsFd;
 	}
 };
-
-Channels::Channels(/* args */)
-{
-}
 
 Channels::~Channels()
 {
