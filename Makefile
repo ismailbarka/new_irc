@@ -1,7 +1,7 @@
 NAME = ircserv
 HEADER = Client.hpp Server.hpp
 
-SRC = main.cpp Server.cpp
+SRC = main.cpp Server.cpp Client.cpp
 OBJ = $(SRC:.cpp=.o)
 
 CC = c++

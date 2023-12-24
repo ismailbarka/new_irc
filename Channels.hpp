@@ -19,7 +19,7 @@ public:
         havePassword = _havePassword;
         topic = "no topic yet\n";
     };
-    ~Channels();
+    ~Channels(){}
     void addClient(int _clientFd)
     {
         std::vector<int>::iterator it = clientsFd.begin();
@@ -37,10 +37,6 @@ public:
 		return clientsFd;
 	}
 };
-
-Channels::~Channels()
-{
-}
 
 
 #endif
