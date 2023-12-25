@@ -1,7 +1,7 @@
 NAME = ircserv
 HEADER = Client.hpp Server.hpp
 
-SRC = main.cpp Server.cpp Client.cpp JoinCommand.cpp InviteCommand.cpp TopicCommand.cpp
+SRC = main.cpp Server.cpp Client.cpp JoinCommand.cpp InviteCommand.cpp TopicCommand.cpp KickCommad.cpp
 OBJ = $(SRC:.cpp=.o)
 
 CC = c++

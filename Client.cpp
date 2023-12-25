@@ -67,3 +67,20 @@
 		commandList.push_back("QUIT");
 	}
     Client::~Client(){};
+
+    void Client::setIpAddress(struct sockaddr_in client_addr)
+    {
+        char *str;
+        str = inet_ntoa(client_addr.sin_addr);
+        this->ipAddress = str;
+    }
+
+    void Client::setHostName()
+    {
+         std::system("hostname > ip.txt");
+        std::ifstream ip("ip.txt");
+        std::string hostname;
+        std::getline(ip, hostname);
+        std::remove("ip.txt");
+        _client_host = hostname;
+    }

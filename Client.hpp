@@ -15,18 +15,23 @@
 #include <fcntl.h>
 #include <map>
 #include <arpa/inet.h>
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
 class Client
 {
 private:
     struct pollfd pFd;
     std::string nickName;
     std::string userName;
+
     bool isAutonticated;
 	std::vector<std::string> commandList;
 	bool correctPassword;
 	char _client_ip[INET_ADDRSTRLEN];
-	std::string _client_host;
 public:
+	std::string _client_host;
+    std::string ipAddress;
     void setPollfd(struct pollfd _pFd);
     void setNickname(std::string _nickName);
     void setuserName(std::string _userName);
@@ -43,6 +48,8 @@ public:
 	std::string getClientHost() const;
 	void setClientHost(std::string host);
 	void fillCommandList();
+    void setIpAddress(struct sockaddr_in client_addr);
+    void setHostName();
     ~Client();
 };
 

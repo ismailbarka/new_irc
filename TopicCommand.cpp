@@ -30,5 +30,4 @@ void Server::handleTopicCommand(std::string params, int i, std::map<std::string,
     }
 
     handlePrivMsg(ClientsMap[_pfds[i].fd].getNickname() + " " + "the current topic is " + it->second.topic, i, channelsV);
-    // send(_pfds[i].fd, it->second.topic )
 }
