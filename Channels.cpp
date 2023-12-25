@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 11:10:17 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/21 11:11:26 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/25 19:16:01 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,17 @@
 
 Channels::Channels()
 {
+	topic = "no topic yet\n";
 }
 
 Channels::~Channels()
 {
 }
-
+Channels::Channels(bool _havePassword)
+{
+	havePassword = _havePassword;
+	topic = "no topic yet\n";
+}
 void Channels::addClient(int _clientFd)
 {
 	std::vector<int>::iterator it = clientsFd.begin();

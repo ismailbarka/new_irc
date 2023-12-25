@@ -1,9 +1,9 @@
 NAME = ircserv
 HEADER = Client.hpp Server.hpp Channels.hpp
 
-SRC = Server.JoinComm.cpp Server.ListComm.cpp Server.ModeComm.cpp Server.NickComm.cpp\
-		Server.PrivMsgComm.cpp Server.QuitComm.cpp Server.UserComm.cpp Server.cpp main.cpp\
-		Client.cpp Channels.cpp
+SRC =   Channels.cpp Client.cpp Server.InviteComm.cpp Server.JoinComm.cpp Server.KickComm.cpp Server.ListComm.cpp\
+		Server.ModeComm.cpp Server.NickComm.cpp Server.PrivMsgComm.cpp Server.QuitComm.cpp Server.TopicComm.cpp\
+		Server.UserComm.cpp Server.cpp main.cpp
 OBJ = $(SRC:.cpp=.o)
 
 CC = c++

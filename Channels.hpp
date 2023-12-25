@@ -5,10 +5,14 @@
 class Channels
 {
 	private:
+	public:
 		std::vector<int> clientsFd;
 		std::string mode;
-	public:
+		std::string password;
+    	bool havePassword;
+    	std::string topic;
 		Channels();
+		Channels(bool _havePassword);
 		~Channels();
 		void addClient(int _clientFd);
 		std::vector<int> getClientFd();
