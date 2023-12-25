@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/21 12:08:25 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/25 19:22:04 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,6 +239,12 @@ void Server::startServer()
 							handleListCommand(i, clients_numbers);
 						} else if (command == "JOIN" || command == "JOIN\n") {
 							handleJoinCommand(params, i, channelsV, _pfds);
+						} else if (command == "INVITE" || command == "INVITE\n") {
+							handleInviteCommand(params, i, channelsV, _pfds);
+						} else if (command == "TOPIC" || command == "TOPIC\n") {
+							handleTopicCommand(params, i, channelsV, _pfds);
+						} else if (command == "KICK" || command == "KICK\n") {
+							handleKickCommand(params, i, channelsV, _pfds);
 						} else if (command == "MODE" || command == "MODE\n") {
 							handleModeCommand(params, i, channelsV);
 						} else {
