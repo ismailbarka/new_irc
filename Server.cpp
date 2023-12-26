@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/26 12:03:12 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/26 12:38:16 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ Server::Server(char **av)
 		std::cout << "failed to set socket to non-blocking mode\n";
 		throw fcntlException();
 	} else {
-		std::cout << "socket on non-blocking mode\n";
+		std::cout << GREEN << "socket on non-blocking mode" << RESET << std::endl;
 	}
 	memset(&server_addr, '\0', sizeof(server_addr));
 	server_addr.sin_family = AF_INET;

@@ -50,29 +50,31 @@ void Server::handleJoinCommand(std::string params, int i, std::map<std::string, 
 			std::cout << "error arguments\n";
 			return;
 		}
-		std::cout << "testtttt\n";
-		while(std::getline(issKey, key, ','))
+		while (std::getline(issKey, key, ','))
 		{
-			if(std::getline(issVlaue, value, ','))
+			if (std::getline(issVlaue, value, ','))
 			{
 				std::map<std::string,Channels>::iterator it = channelsV.find(key);
-				if(it == channelsV.end()) //there is a password
+				if (it == channelsV.end()) //there is no channel with this name and have password
 				{
 					if(key[0] != '#')
 						key = "#" + key;
-					std::string resp1 = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" + ClientsMap[_pfds[i].fd].ipAddress + " JOIN :" + key + "\r\n";
-					send(_pfds[i].fd, resp1.c_str(), resp1.length(), 0);
-					std::string resp2 = ":" + ClientsMap[_pfds[i].fd].getNickname() + " JOIN " + key + "\r\n";
+					std::string resp2 = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" + ClientsMap[_pfds[i].fd].ipAddress + " JOIN :" + key + "\r\n";
+					// send(_pfds[i].fd, resp1.c_str(), resp1.length(), 0);
+					// std::string resp2 = ":" + ClientsMap[_pfds[i].fd].getNickname() + " JOIN " + key + "\r\n";
+					resp2 += "332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :" + "Topic1" + "\r\n";
 					send(_pfds[i].fd, resp2.c_str(), resp2.length(), 0);
-					std::string resp3 = ClientsMap[_pfds[i].fd]._client_host + " 353 " + ClientsMap[_pfds[i].fd].getNickname() + " = " + key + " :" + ClientsMap[_pfds[i].fd].getUserName() + "\r\n";
-					send(_pfds[i].fd, resp3.c_str(), resp3.length(), 0);
-					std::string resp4 = ClientsMap[_pfds[i].fd]._client_host + " 366 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :End of /NAMES list\r\n";
-					send(_pfds[i].fd, resp4.c_str(), resp4.length(), 0);
+					// std::string resp3 = ClientsMap[_pfds[i].fd]._client_host + " 353 " + ClientsMap[_pfds[i].fd].getNickname() + " = " + key + " :" + ClientsMap[_pfds[i].fd].getUserName() + "\r\n";
+					// send(_pfds[i].fd, resp3.c_str(), resp3.length(), 0);
+					// std::string resp4 = ClientsMap[_pfds[i].fd]._client_host + " 366 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :End of /NAMES list\r\n";
+					// send(_pfds[i].fd, resp4.c_str(), resp4.length(), 0);
 					Channels newChannel(true);
 					newChannel.addClient(_pfds[i].fd);
 					if(key[0] != '#')
 						key = "#" + key;
 					newChannel.password = value;
+					// newChannel.havePassword = true;
+					newChannel.operators.push_back(ClientsMap[_pfds[i].fd]);
 					channelsV[key] = newChannel;
 				}
 				else
@@ -84,53 +86,69 @@ void Server::handleJoinCommand(std::string params, int i, std::map<std::string, 
 					{
 						std::string resp = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have already JOINED " + key + "\n";
 			 			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
-					}else {
-						if(it->second.havePassword == true && value == it->second.password)
+					} else {
+						if (it->second.havePassword == true)
 						{
-						if(key[0] != '#')
-							key = "#" + key;
-						std::string resp1 = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" + ClientsMap[_pfds[i].fd].ipAddress + " JOIN :" + key + "\r\n";
-						send(_pfds[i].fd, resp1.c_str(), resp1.length(), 0);
-						std::string resp2 = ":" + ClientsMap[_pfds[i].fd].getNickname() + " JOIN " + key + "\r\n";
-						send(_pfds[i].fd, resp2.c_str(), resp2.length(), 0);
-						std::string msg = ":" + ClientsMap[_pfds[i].fd]._client_host + " 332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :" + "topic" + "\r\n";
-						handlePrivMsg(msg, i, channelsV);
-						std::string resp3 = ClientsMap[_pfds[i].fd]._client_host + " 353 " + ClientsMap[_pfds[i].fd].getNickname() + " = " + key + " :" + ClientsMap[_pfds[i].fd].getUserName() + "\r\n";
-						send(_pfds[i].fd, resp3.c_str(), resp3.length(), 0);
-						std::string resp4 = ClientsMap[_pfds[i].fd]._client_host + " 366 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :End of /NAMES list\r\n";
-						send(_pfds[i].fd, resp4.c_str(), resp4.length(), 0);
-						it->second.addClient(_pfds[i].fd);
-						}
-						else
-						{
+						  if (value == it->second.password)
+						  {
+							if (key[0] != '#')
+								key = "#" + key;
+							std::string resp2 = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" + ClientsMap[_pfds[i].fd].ipAddress + " JOIN :" + key + "\r\n";
+							// send(_pfds[i].fd, resp1.c_str(), resp1.length(), 0);
+							// std::string resp2 = ":" + ClientsMap[_pfds[i].fd].getNickname() + " JOIN " + key + "\r\n";
+							resp2 += "332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :" + "Topic2" + "\r\n";
+							send(_pfds[i].fd, resp2.c_str(), resp2.length(), 0);
+							// handlePrivMsg(msg, i, channelsV);
+							// std::string resp3 = ClientsMap[_pfds[i].fd]._client_host + " 353 " + ClientsMap[_pfds[i].fd].getNickname() + " = " + key + " :" + ClientsMap[_pfds[i].fd].getUserName() + "\r\n";
+							// send(_pfds[i].fd, resp3.c_str(), resp3.length(), 0);
+							// std::string resp4 = ClientsMap[_pfds[i].fd]._client_host + " 366 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :End of /NAMES list\r\n";
+							// send(_pfds[i].fd, resp4.c_str(), resp4.length(), 0);
+							it->second.addClient(_pfds[i].fd);
+						  } else {
 							std::string resp = "475 " + ClientsMap[_pfds[i].fd].getNickname() + " incorrect password " + "\n";
 							send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 							std::cout << "encorrect password\n";
+						  }
+						}
+						else
+						{
+							std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" + ClientsMap[_pfds[i].fd].ipAddress + " JOIN :" + key + "\r\n";
+							// send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
+							// std::string resp1 = ":" + ClientsMap[_pfds[i].fd].getNickname() + " JOIN " + key + "\r\n";
+							resp += "332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :" + "Topic3" + "\r\n";
+							send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
+							// handlePrivMsg(msg, i, channelsV);
+							// std::string resp2 = ClientsMap[_pfds[i].fd]._client_host + " 353 " + ClientsMap[_pfds[i].fd].getNickname() + " = " + key + " :" + ClientsMap[_pfds[i].fd].getUserName() + "\r\n";
+							// send(_pfds[i].fd, resp2.c_str(), resp2.length(), 0);
+							// std::string resp3 = ClientsMap[_pfds[i].fd]._client_host + " 366 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :End of /NAMES list\r\n";
+							// send(_pfds[i].fd, resp3.c_str(), resp3.length(), 0);
+							it->second.addClient(_pfds[i].fd);
 						}
 					}
 				}
 			}
-			else
+			else // there is no password for the channel
 			{
 				std::map<std::string,Channels>::iterator it = channelsV.find(key);
-				if(it == channelsV.end())
+				if (it == channelsV.end()) //there is no channel with this name and don't have a password
 				{
-					if(key[0] != '#')
+					if (key[0] != '#')
 						key = "#" + key;
 					std::string resp1 = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" + ClientsMap[_pfds[i].fd].ipAddress + " JOIN :" + key + "\r\n";
-						send(_pfds[i].fd, resp1.c_str(), resp1.length(), 0);
-						std::string resp2 = ":" + ClientsMap[_pfds[i].fd].getNickname() + " JOIN " + key + "\r\n";
-						send(_pfds[i].fd, resp2.c_str(), resp2.length(), 0);
-						std::string msg = ":" + ClientsMap[_pfds[i].fd]._client_host + " 332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :" + "topic" + "\r\n";
-						handlePrivMsg(msg, i, channelsV);
-						std::string resp3 = ClientsMap[_pfds[i].fd]._client_host + " 353 " + ClientsMap[_pfds[i].fd].getNickname() + " = " + key + " :" + ClientsMap[_pfds[i].fd].getUserName() + "\r\n";
-						send(_pfds[i].fd, resp3.c_str(), resp3.length(), 0);
-						std::string resp4 = ClientsMap[_pfds[i].fd]._client_host + " 366 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :End of /NAMES list\r\n";
-						send(_pfds[i].fd, resp4.c_str(), resp4.length(), 0);
+					// send(_pfds[i].fd, resp1.c_str(), resp1.length(), 0);
+					// std::string resp2 = ":" + ClientsMap[_pfds[i].fd].getNickname() + " JOIN " + key + "\r\n";
+					resp1 += "332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :" + "Topic4" + "\r\n";
+					send(_pfds[i].fd, resp1.c_str(), resp1.length(), 0);
+					// handlePrivMsg(msg, i, channelsV);
+					// std::string resp3 = ClientsMap[_pfds[i].fd]._client_host + " 353 " + ClientsMap[_pfds[i].fd].getNickname() + " = " + key + " :" + ClientsMap[_pfds[i].fd].getUserName() + "\r\n";
+					// send(_pfds[i].fd, resp3.c_str(), resp3.length(), 0);
+					// std::string resp4 = ClientsMap[_pfds[i].fd]._client_host + " 366 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :End of /NAMES list\r\n";
+					// send(_pfds[i].fd, resp4.c_str(), resp4.length(), 0);
 					Channels newChannel(false);
 					newChannel.addClient(_pfds[i].fd);
 					newChannel.password = "0";
 					channelsV[key] = newChannel;
+					std::cout << "Client ip address: " << ClientsMap[_pfds[i].fd].ipAddress << "\n";
 				}
 				else
 				{
@@ -144,17 +162,18 @@ void Server::handleJoinCommand(std::string params, int i, std::map<std::string, 
 						std::string resp = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have already JOINED " + key + "\n";
 			 			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 		 				return;
-					}else {
-						if(it->second.havePassword == false)
+					} else {
+						if (it->second.havePassword == false)
 						{
-						std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + " JOIN " + key + "\n";
-						resp += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have sucssefully JOINED " + key + "\n";
-						send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
-						it->second.addClient(_pfds[i].fd);
+							std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + " JOIN " + key + "\n";
+							resp += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have sucssefully JOINED " + key + "\n";
+							resp += "332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :" + "Topic5" + "\n";
+							send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
+							it->second.addClient(_pfds[i].fd);
 						}
 						else
 						{
-							std::string resp = "339 " + ClientsMap[_pfds[i].fd].getNickname() + ": incorrect pass " + key + "\n";
+							std::string resp = "475 " + ClientsMap[_pfds[i].fd].getNickname() + ": incorrect pass " + key + "\n";
 							// resp += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have sucssefully JOINED " + key + "\n";
 							send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 							std::cout << "encorrect password\n";
@@ -163,6 +182,5 @@ void Server::handleJoinCommand(std::string params, int i, std::map<std::string, 
 					}
 				}
 			}
-			
 		} 
 	}

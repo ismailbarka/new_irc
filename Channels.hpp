@@ -7,6 +7,7 @@ class Channels
 	private:
 	public:
 		std::vector<int> clientsFd;
+		std::vector<Client> operators;
 		std::string mode;
 		std::string password;
     	bool havePassword;

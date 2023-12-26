@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 11:02:19 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/21 11:09:31 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/26 15:57:32 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ bool Client::getIsAutonticated()
 
 void Client::setClientIp(char *ip)
 {
-	strcpy(_client_ip, ip);
+	strcpy(ipAddress, ip);
 }
 
 void Client::setCorrectPassWord(bool _correctPassword)

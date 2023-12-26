@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/26 11:56:28 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/26 12:38:34 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,10 @@
 #include <sstream>
 #include <stdio.h>
 #include <arpa/inet.h>
+
+# define GREEN "\033[32m"
+# define RED "\033[31m"
+# define RESET "\033[0m"
 
 
 class Client;
