@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/25 19:13:02 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/26 11:56:28 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,7 @@ public:
 	void handleInviteCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void handleKickCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void handleTopicCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
+	void handlePartCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void startServer();
 	~Server();
 	int nameTofd(std::string userName)

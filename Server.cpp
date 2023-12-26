@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/25 19:22:04 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/26 12:03:12 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,6 +247,8 @@ void Server::startServer()
 							handleKickCommand(params, i, channelsV, _pfds);
 						} else if (command == "MODE" || command == "MODE\n") {
 							handleModeCommand(params, i, channelsV);
+						} else if (command == "PART" || command == "PART\n") {
+							handlePartCommand(params, i, channelsV, _pfds);
 						} else {
 							std::string response = "421 " + ClientsMap[_pfds[i].fd].getNickname() + " :Unknown command: " + command + "\n";
 							std::cout << "response: " << response << std::endl;

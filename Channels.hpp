@@ -19,6 +19,7 @@ class Channels
 		std::vector<int>  & getClientsFd();
 		void setMode(std::string _mode);
 		std::string getMode();
+		void removeClient(int _clientFd);
 };
 
 #endif

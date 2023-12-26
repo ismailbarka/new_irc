@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:41:43 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/21 10:42:34 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/26 11:33:34 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ void Server::handlePrivMsg(std::string params, int i, std::map<std::string,Chann
 	std::string message = params.substr(params.find(" ") + 1);
 	message = message.substr(message.find(":") + 1);
 	std::cout << "------PRIVMSG------" << std::endl;
+	std::cout << "=> req: " << params << std::endl;
 	std::cout << "sender: " << sender << std::endl;
 	std::cout << "target: " << target << std::endl;
 	std::cout << "message: " << message << std::endl;
