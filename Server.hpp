@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/21 12:08:42 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/26 12:38:34 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,17 @@
 #include <stdio.h>
 #include <arpa/inet.h>
 
+# define GREEN "\033[32m"
+# define RED "\033[31m"
+# define RESET "\033[0m"
+
 
 class Client;
 class Channels;
 class Server
 {
 private:
+public:
 	int serverSocket;
 	struct pollfd _pfds[1024];
 	std::string nickName;
@@ -51,7 +56,6 @@ private:
 	std::map<int, Client> ClientsMap;
 	std::string _password;
 	Server();
-public:
 	//create own exception
 	class ServerException : public std::exception {
 		public:
@@ -112,9 +116,25 @@ public:
 	void handleQuitCommand(int i, int & clients_numbers);
 	void handlePrivMsg(std::string params, int i, std::map<std::string,Channels> &channelsV);
 	void handleModeCommand(std::string params,int i,std::map<std::string, Channels> & channelsV);
+	void handleInviteCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
+	void handleKickCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
+	void handleTopicCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
+	void handlePartCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void startServer();
 	~Server();
+	int nameTofd(std::string userName)
+	{
+		std::map<int, Client>::iterator it = ClientsMap.begin();
+		while(it != ClientsMap.end())
+		{
+			if(it->second.getUserName() == userName)
+				return it->first;
+			it++;
+		}
+		return -1;
+	}
 };
 std::string trimString(const std::string& str);
+
 
 #endif

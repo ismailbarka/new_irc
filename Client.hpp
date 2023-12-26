@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 11:02:31 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/21 11:08:17 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/26 15:57:13 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,10 @@ class Client
 		bool isAutonticated;
 		std::vector<std::string> commandList;
 		bool correctPassword;
-		char _client_ip[INET_ADDRSTRLEN];
-		std::string _client_host;
 	public:
+		char ipAddress[INET_ADDRSTRLEN];
+		std::string _client_host;
+		// std::string ipAddress;
 		void setPollfd(struct pollfd _pFd);
 		void setNickname(std::string _nickName);
 		void setuserName(std::string _userName);

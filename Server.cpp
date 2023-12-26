@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/21 12:08:25 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/26 12:38:16 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ Server::Server(char **av)
 		std::cout << "failed to set socket to non-blocking mode\n";
 		throw fcntlException();
 	} else {
-		std::cout << "socket on non-blocking mode\n";
+		std::cout << GREEN << "socket on non-blocking mode" << RESET << std::endl;
 	}
 	memset(&server_addr, '\0', sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
@@ -239,8 +239,16 @@ void Server::startServer()
 							handleListCommand(i, clients_numbers);
 						} else if (command == "JOIN" || command == "JOIN\n") {
 							handleJoinCommand(params, i, channelsV, _pfds);
+						} else if (command == "INVITE" || command == "INVITE\n") {
+							handleInviteCommand(params, i, channelsV, _pfds);
+						} else if (command == "TOPIC" || command == "TOPIC\n") {
+							handleTopicCommand(params, i, channelsV, _pfds);
+						} else if (command == "KICK" || command == "KICK\n") {
+							handleKickCommand(params, i, channelsV, _pfds);
 						} else if (command == "MODE" || command == "MODE\n") {
 							handleModeCommand(params, i, channelsV);
+						} else if (command == "PART" || command == "PART\n") {
+							handlePartCommand(params, i, channelsV, _pfds);
 						} else {
 							std::string response = "421 " + ClientsMap[_pfds[i].fd].getNickname() + " :Unknown command: " + command + "\n";
 							std::cout << "response: " << response << std::endl;
