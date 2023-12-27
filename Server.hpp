@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/26 12:38:34 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/27 12:12:03 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,12 +122,12 @@ public:
 	void handlePartCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void startServer();
 	~Server();
-	int nameTofd(std::string userName)
+	int nameTofd(std::string nickName)
 	{
 		std::map<int, Client>::iterator it = ClientsMap.begin();
 		while(it != ClientsMap.end())
 		{
-			if(it->second.getUserName() == userName)
+			if(it->second.getNickname() == nickName)
 				return it->first;
 			it++;
 		}

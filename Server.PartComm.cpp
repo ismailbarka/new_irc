@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/26 11:54:49 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/26 12:20:07 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/27 10:36:41 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@ void Server::handlePartCommand(std::string params, int i, std::map<std::string, 
 	if (it != channelsV.end())
 	{
 		//check if the client is not in the channel
-		std::vector<int>::iterator it1 = it->second.getClientsFd().begin();
-		while (it1 != it->second.getClientsFd().end() && *it1 != _pfds[i].fd)
+		std::vector<int>::iterator it1 = it->second.clientsFd.begin();
+		while (it1 != it->second.clientsFd.end() && *it1 != _pfds[i].fd)
 			it1++;
-		if (it1 == it->second.getClientsFd().end())
+		if (it1 == it->second.clientsFd.end())
 		{
 			std::string resp = "ERROR YOU ARE NOT IN THIS CHANNEL [" + channel.substr(channel.find("#") + 1) + "]\n";
 			std::cout << "response: " << resp;
@@ -37,7 +37,7 @@ void Server::handlePartCommand(std::string params, int i, std::map<std::string, 
 			it->second.removeClient(_pfds[i].fd);
 			std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PART " + channel + " :" + msg + "\n";
 			std::cout << "response: " << resp << std::endl;
-			std::vector<int> clientFds = it->second.getClientFd();
+			std::vector<int> clientFds = it->second.clientsFd;
 			std::vector<int>::iterator it1 = clientFds.begin();
 			while (it1 != clientFds.end())
 			{
@@ -51,8 +51,7 @@ void Server::handlePartCommand(std::string params, int i, std::map<std::string, 
 			}
 		}
 	} else {
-		std::string resp = "ERROR NO CHANNEL WITH THIS NAME [" + channel.substr(channel.find("#") + 1) + "]\n";
-		resp += "ERROR YOU NEED TO CREATE/JOIN THIS CHANNEL FIRST\n";
+		std::string resp = "403 " + ClientsMap[_pfds[i].fd].getNickname() + " :" + channel +" No such channel\n";
 		std::cout << "response: " << resp;
 		if (send(_pfds[i].fd, resp.c_str(), resp.length(), 0) == -1)
 			throw sendException();

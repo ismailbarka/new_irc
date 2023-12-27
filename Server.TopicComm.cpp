@@ -6,10 +6,31 @@ void Server::handleTopicCommand(std::string params, int i, std::map<std::string,
     std::stringstream iss(params);
     std::string channelName;
     std::string newTopic;
-    iss >> channelName;
+	std::string tmp;
+    std::getline(iss, channelName, ' ');
+	while (std::getline(iss, tmp, ' ')){
+		newTopic += tmp;
+		newTopic += " ";
+	}
     std::map<std::string, Channels>::iterator it = channelsV.find(channelName);
-    if (iss >> newTopic)
+    if (it == channelsV.end())
     {
+        std::string response = "403 " + ClientsMap[_pfds[i].fd].getNickname() + " :" + channelName +" No such channel\n";
+        send(_pfds[i].fd, response.c_str(), response.length(), 0);
+        std::cout << "no channel with this name : " << channelName << "\n";
+        return ;
+    }
+	if (newTopic.size())
+	{
+		if (newTopic[0] == ':')
+			newTopic.erase(0, 1);
+		if (newTopic.size() > 80)
+		{
+			std::string reponse = "Topic is too long\n\n";
+			send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
+			std::cout << "Topic is too long\n";
+			return ;
+		}
 		//check if the client is the operator of the channel
 		std::vector<Client>::iterator itOp = it->second.operators.begin();
 		while (itOp != it->second.operators.end())
@@ -18,31 +39,17 @@ void Server::handleTopicCommand(std::string params, int i, std::map<std::string,
 				break;
 			itOp++;
 		}
-		if (itOp == it->second.operators.end())
+		if (itOp == it->second.operators.end() && (it->second.mode[0] == '+' && it->second.mode.find('t') != std::string::npos))
 		{
-			std::string reponse = "482 " + ClientsMap[_pfds[i].fd].getNickname() +  " you're not the channel operator\n\n";
-			send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
+			std::string response = "482 " + ClientsMap[_pfds[i].fd].getNickname() + " " + channelName + " :You're not channel operator\n";
+			send(_pfds[i].fd, response.c_str(), response.length(), 0);
 			std::cout << "the client is not the operator of the channel\n";
 			return ;
 		}
-        if (it == channelsV.end())
-        {
-            std::string reponse = "403 " + ClientsMap[_pfds[i].fd].getNickname() +  " channel not found\n\n";
-            send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
-            std::cout << "no channel with this name: " << channelName << "\n";
-            return ;
-        }
         it->second.topic = newTopic;
-        handlePrivMsg(channelName + " " + "the new topic is " + it->second.topic, i, channelsV);
-        return ;
-    }
-    if (it == channelsV.end())
-    {
-        std::string reponse = "403 " + ClientsMap[_pfds[i].fd].getNickname() +  " channel not found\n\n";
-        send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
-        std::cout << "no channel with this name : " << channelName << "\n";
-        return ;
-    }
+		std::string topicResponse = ":" + ClientsMap[_pfds[i].fd].getNickname() + " TOPIC " + channelName + " :" + it->second.topic + "\n";
+		send(_pfds[i].fd, topicResponse.c_str(), topicResponse.length(), 0);
+	}
 	std::string topicResponse = "332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + channelName + " :" + it->second.topic + "\n";
 	std::cout << "topicResponse: " << topicResponse << std::endl;
 	send(_pfds[i].fd, topicResponse.c_str(), topicResponse.length(), 0);

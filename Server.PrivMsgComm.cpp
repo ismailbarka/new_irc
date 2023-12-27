@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:41:43 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/26 11:33:34 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/27 10:13:54 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,10 @@ void Server::handlePrivMsg(std::string params, int i, std::map<std::string,Chann
 				throw sendException();
 		} else {
 			//check if the client is not in the channel
-			std::vector<int>::iterator it1 = it->second.getClientsFd().begin();
-			while (it1 != it->second.getClientsFd().end() && *it1 != _pfds[i].fd)
+			std::vector<int>::iterator it1 = it->second.clientsFd.begin();
+			while (it1 != it->second.clientsFd.end() && *it1 != _pfds[i].fd)
 				it1++;
-			if (it1 == it->second.getClientsFd().end())
+			if (it1 == it->second.clientsFd.end())
 			{
 				std::string resp = "ERROR YOU ARE NOT IN THIS CHANNEL [" + target.substr(target.find("#") + 1) + "]\n";
 				std::cout << "response: " << resp;
@@ -44,9 +44,8 @@ void Server::handlePrivMsg(std::string params, int i, std::map<std::string,Chann
 					throw sendException();
 				return;
 			}
-			std::vector<int> clientFds = it->second.getClientFd();
-			it1 = clientFds.begin();
-			while (it1 != clientFds.end())
+			it1 = it->second.clientsFd.begin();
+			while (it1 != it->second.clientsFd.end())
 			{
 				std::map<int, Client>::iterator itt = ClientsMap.find(*it1);
 				if (itt->second.getIsAutonticated() == true && itt->second.getNickname() != sender) {

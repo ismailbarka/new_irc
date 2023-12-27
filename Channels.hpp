@@ -8,19 +8,23 @@ class Channels
 	public:
 		std::vector<int> clientsFd;
 		std::vector<Client> operators;
+		std::vector<Client> invited;
 		std::string mode;
 		std::string password;
-    	bool havePassword;
     	std::string topic;
+		std::string limit;
+    	bool havePassword;
 		Channels();
 		Channels(bool _havePassword);
 		~Channels();
-		void addClient(int _clientFd);
-		std::vector<int> getClientFd();
-		std::vector<int>  & getClientsFd();
-		void setMode(std::string _mode);
 		std::string getMode();
+		void setKey(std::string _key);
+		void setLimit(std::string _limit);
+		void addClient(int _clientFd);
+		void setMode(std::string _mode);
 		void removeClient(int _clientFd);
+		// std::vector<int> getClientFd();
+		// std::vector<int>  & getClientsFd();
 };
 
 #endif
