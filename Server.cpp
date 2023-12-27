@@ -6,11 +6,23 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/26 12:38:16 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/27 13:31:04 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+
+void Server::sendMagTomembers(std::string msg, std::vector<int> clientFd)
+{
+	std::cout <<"i am here----\n";	
+	std::vector<int>::iterator it = clientFd.begin();
+	while (it != clientFd.end())
+	{
+		send(*it, msg.c_str(), msg.length(), 0);
+		it++;
+	}
+}
+
 
 std::string trimString(const std::string& str) {
 	size_t start = 0;
@@ -167,9 +179,9 @@ void Server::startServer()
 				char buffer[1024];
 				memset(buffer, 0, sizeof(buffer));
 				int readed = recv(_pfds[i].fd, buffer, 1024, 0);
-				buffer[readed] = '\0';
 				if (readed < 0) {
 					throw recvException();
+				buffer[readed] = '\0';
 				} else if (readed == 0) {
 					if (_pfds[i].revents & POLLHUP)
 					{

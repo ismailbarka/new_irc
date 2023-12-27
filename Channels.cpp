@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 11:10:17 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/26 12:12:30 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/27 15:54:17 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,14 @@ Channels::Channels()
 Channels::~Channels()
 {
 }
+
 Channels::Channels(bool _havePassword)
 {
 	havePassword = _havePassword;
 	topic = "no topic yet\n";
+	mode = "+t";
 }
+
 void Channels::addClient(int _clientFd)
 {
 	std::vector<int>::iterator it = clientsFd.begin();
@@ -34,19 +37,43 @@ void Channels::addClient(int _clientFd)
 		clientsFd.push_back(_clientFd);
 }
 
-std::vector<int> Channels::getClientFd()
-{
-	return clientsFd;
-}
+// std::vector<int> Channels::getClientFd()
+// {
+// 	return clientsFd;
+// }
 
-std::vector<int>  & Channels::getClientsFd()
-{
-	return clientsFd;
-}
+// std::vector<int>  & Channels::getClientsFd()
+// {
+// 	return clientsFd;
+// }
 
 void Channels::setMode(std::string _mode)
 {
-	mode = _mode;
+	if (mode[0] == '+')
+	mode += _mode;
+	else
+	{
+		int i = 1;
+		while (mode[i] != '\0')
+		{
+			if (mode[i] == _mode[1])
+			{
+				mode.erase(i,1);
+				break;
+			}
+			i++;
+		}
+	}
+}
+
+void Channels::setKey(std::string _key)
+{
+	password = _key;
+}
+
+void Channels::setLimit(std::string _limit)
+{
+	limit = _limit;
 }
 
 std::string Channels::getMode()
