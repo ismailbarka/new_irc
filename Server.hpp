@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/27 12:12:03 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/27 19:36:23 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,8 @@ public:
 	void handleTopicCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void handlePartCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void startServer();
+	void firstJoin(std::string key, std::string value, bool pass, int i, std::map<std::string, Channels> &channelsV);
+	void joinChannel(std::string key, int i, std::map<std::string, Channels> &channelsV);
 	~Server();
 	int nameTofd(std::string nickName)
 	{
