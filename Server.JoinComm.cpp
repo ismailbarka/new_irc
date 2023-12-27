@@ -100,8 +100,11 @@ void Server::handleJoinCommand(std::string params, int i, std::map<std::string, 
 									key = "#" + key;
 								std::string resp2 = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" + ClientsMap[_pfds[i].fd].ipAddress + " JOIN :" + key + "\r\n";
 								resp2 += "332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :" + "Topic2" + "\r\n";
+								resp2 += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have sucssefully JOINED " + key + "\n";								
 								send(_pfds[i].fd, resp2.c_str(), resp2.length(), 0);
 								it->second.addClient(_pfds[i].fd);
+								if (it1 != it->second.invited.end())
+									it->second.invited.erase(it1);
 							} else {
 								std::string resp = "475 " + ClientsMap[_pfds[i].fd].getNickname() + " incorrect password " + "\n";
 								send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
