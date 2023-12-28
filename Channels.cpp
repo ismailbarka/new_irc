@@ -89,3 +89,15 @@ void Channels::removeClient(int _clientFd)
 	if (it != clientsFd.end())
 		clientsFd.erase(it);
 }
+
+bool Channels::isOperator(int _clientFd)
+{
+	std::vector<Client>::iterator it = operators.begin();
+	while (it != operators.end())
+	{
+		if (it->getfd() == _clientFd)
+			return true;
+		it++;
+	}
+	return false;
+}

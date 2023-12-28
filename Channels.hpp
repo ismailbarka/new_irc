@@ -23,6 +23,7 @@ class Channels
 		void addClient(int _clientFd);
 		void setMode(std::string _mode);
 		void removeClient(int _clientFd);
+		bool isOperator(int _clientFd);
 		// std::vector<int> getClientFd();
 		// std::vector<int>  & getClientsFd();
 };
