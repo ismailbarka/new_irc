@@ -60,8 +60,9 @@ void Server::handleKickCommand(std::string params, int i, std::map<std::string, 
                 {
                     channelIt->second.clientsFd.erase(it);
 					bool check = false;
-                    send(_pfds[i].fd, "Error : user kicked successfully\r\n", 34, 0);
-					msg = "Error : " + userName + " have been kicked from " + channelName + "\nREASON : ";
+					msg = ":" + ClientsMap[_pfds[i].fd].getNickname() + " KICK " + channelName + " " + userName + "\r\n";
+                    send(_pfds[i].fd, msg.c_str(), msg.size(), 0);
+					// msg = "Error : " + userName + " have been kicked from " + channelName + "\nREASON : ";
 					std::string line_;
 					while(iss >> line_)
 					{
