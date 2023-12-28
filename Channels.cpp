@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 11:10:17 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/27 15:54:17 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/28 10:27:56 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,4 +88,16 @@ void Channels::removeClient(int _clientFd)
 		it++;
 	if (it != clientsFd.end())
 		clientsFd.erase(it);
+}
+
+bool Channels::isOperator(int _clientFd)
+{
+	std::vector<Client>::iterator it = operators.begin();
+	while (it != operators.end())
+	{
+		if (it->getfd() == _clientFd)
+			return true;
+		it++;
+	}
+	return false;
 }

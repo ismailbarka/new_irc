@@ -38,6 +38,7 @@ void Server::firstJoin(std::string key, std::string value, bool pass, int i, std
 	channel.havePassword = pass;
 	channel.password = value;
 	channel.addClient(_pfds[i].fd);
+	channel.operators.push_back(ClientsMap[_pfds[i].fd]);
 	channelsV.insert(std::pair<std::string, Channels>(key, channel));
 	std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" + ClientsMap[_pfds[i].fd].ipAddress + " JOIN " + key + "\n";
 	resp += ":" + std::string(ClientsMap[_pfds[i].fd].ipAddress) + " MODE " + key + " +o " + ClientsMap[_pfds[i].fd].getNickname() + "\r\n";
@@ -71,12 +72,25 @@ void Server::joinChannel(std::string key, int i, std::map<std::string, Channels>
 	if (key[0] != '#')
 		key = "#" + key;
 	std::string resp2 = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" + ClientsMap[_pfds[i].fd].ipAddress + " JOIN :" + key + "\r\n";
+	send(_pfds[i].fd, resp2.c_str(), resp2.length(), 0);
 	it->second.addClient(_pfds[i].fd);
 	//inform all the clients in the channel that this client joined
 	std::vector<int>::iterator it2 = it->second.clientsFd.begin();
 	while (it2 != it->second.clientsFd.end())
 	{
-		send(*it2, resp2.c_str(), resp2.length(), 0);
+		std::vector<int>::iterator it3 = it->second.clientsFd.begin();
+		while (it3 != it->second.clientsFd.end())
+		{
+			if (*it2 != *it3)
+			{
+				std::string resp = ":" + ClientsMap[*it3].getNickname() + "!~" + ClientsMap[*it3].getUserName() + "@" + ClientsMap[*it3].ipAddress + " JOIN :" + key + "\r\n";
+				if (it->second.isOperator(*it3))
+					resp += ":" + std::string(ClientsMap[*it3].ipAddress) + " MODE " + key + " +o " + ClientsMap[*it3].getNickname() + "\r\n";
+				send(*it2, resp.c_str(), resp.length(), 0);
+			}
+			it3++;
+		}
+		// send(*it2, resp2.c_str(), resp2.length(), 0);
 		it2++;
 	}
 	resp2 = "332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :" + "Topic2" + "\r\n";
