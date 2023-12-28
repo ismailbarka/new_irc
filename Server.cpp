@@ -12,6 +12,18 @@
 
 #include "Server.hpp"
 
+void Server::sendMagTomembers(std::string msg, std::vector<int> clientFd)
+{
+	std::cout <<"i am here----\n";	
+	std::vector<int>::iterator it = clientFd.begin();
+	while (it != clientFd.end())
+	{
+		send(*it, msg.c_str(), msg.length(), 0);
+		it++;
+	}
+}
+
+
 std::string trimString(const std::string& str) {
 	size_t start = 0;
 	size_t end = str.length();

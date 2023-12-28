@@ -106,6 +106,7 @@ public:
 	Server(char **av);
 	void bindSocket();
 	void listenSocket();
+	void sendMagTomembers(std::string msg, std::vector<int> clientFd);
 	void setPollfd();
 	void setPollfd(struct pollfd _pfd);
 	void setPollfd(struct pollfd _pfd, int index);
