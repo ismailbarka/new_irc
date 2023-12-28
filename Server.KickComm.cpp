@@ -58,7 +58,6 @@ void Server::handleKickCommand(std::string params, int i, std::map<std::string, 
                     send(_pfds[i].fd, "Error: you cant kick the owner\r\n", 32, 0);
                 else
                 {
-                    channelIt->second.clientsFd.erase(it);
 					bool check = false;
 					msg = ":" + ClientsMap[_pfds[i].fd].getNickname() + " KICK " + channelName + " " + userName + "\r\n";
                     send(_pfds[i].fd, msg.c_str(), msg.size(), 0);
@@ -77,6 +76,7 @@ void Server::handleKickCommand(std::string params, int i, std::map<std::string, 
 						msg+= "no reason";
 					}
 					sendMagTomembers(msg, channelIt->second.clientsFd);
+                    channelIt->second.clientsFd.erase(it);
                 }
 			} else {
 				std::string reponse = "476 " + ClientsMap[_pfds[i].fd].getNickname() + " the user is not in the channel\r\n";
