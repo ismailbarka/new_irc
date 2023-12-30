@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/27 13:31:04 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/30 10:56:04 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,8 +169,8 @@ void Server::startServer()
 				memset(buffer, 0, sizeof(buffer));
 				int readed = recv(_pfds[i].fd, buffer, 1024, 0);
 				if (readed < 0) {
-					throw recvException();
-				buffer[readed] = '\0';
+					perror("recv Error");
+					continue;
 				} else if (readed == 0) {
 					if (_pfds[i].revents & POLLHUP)
 					{

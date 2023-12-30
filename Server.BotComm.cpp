@@ -1,5 +1,4 @@
 #include "Server.hpp"
-#include <ctime>
 
 void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
 {
@@ -22,7 +21,7 @@ void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
                                     "*_-_KICK_-_Eject_a_client_from_the_channe__________________________________________*",
                                     "*_-_INVITE_-_Invite_a_client_to_a_channel__________________________________________*",
                                     "*_-_TOPIC_-_Change_or_view_the_channel_topic_______________________________________*",
-                                    "*_-_MODE_-_Change_the_channel’s_mode:______________________________________________*",
+                                    "*_-_MODE_-_Change_the_channel's_mode:______________________________________________*",
                                     "*___+_i:_Set/remove_Invite-only_channel____________________________________________*",
                                     "*___+_t:_Set/remove_the_restrictions_of_the_TOPIC_command_to_channel_operators_____*",
                                     "*___+_k:_Set/remove_the_channel_key_(password)_____________________________________*",

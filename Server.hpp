@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/28 10:28:04 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/30 09:43:18 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@
 #include <stdio.h>
 #include <arpa/inet.h>
 #include <algorithm>
+#include <ctime>
+#include "time.h"
 
 # define GREEN "\033[32m"
 # define RED "\033[31m"

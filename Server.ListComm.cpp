@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:45:29 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/21 10:46:18 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/30 11:25:28 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,19 @@
 
 void Server::handleListCommand(int i, int clients_numbers)
 {
-	std::map<int, Client>::iterator it;
-	std::cout << "clients_numbers: " << clients_numbers - 1 << std::endl;
-	for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
-		if (it->second.getIsAutonticated()) {
-			std::string res = "[" + std::to_string(it->second.getfd());
-			res += "] [" + it->second.getNickname() + "] [ " + it->second.getUserName() + " ]\n";
-			std::string response = "393 "+ ClientsMap[_pfds[i].fd].getNickname() + res + "\n";
-			std::cout << "response: " << response;
-			send(_pfds[i].fd, response.c_str(), response.length(), 0);
-		}
+	//list all channels
+	(void)clients_numbers;
+	std::string reponse = "321 Channel :Users  Name\r\n";
+	send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
+	std::map<std::string, Channels>::iterator it = channelsV.begin();
+	while (it != channelsV.end())
+	{
+		std::string reponse = "322 Channel :" + it->first + "\r\n";
+		//membres count
+		std::cout << reponse << std::endl;
+		send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
+		it++;
 	}
+	std::string reponse2 = "323 End of /LIST\r\n";
+	send(_pfds[i].fd, reponse2.c_str(), reponse2.length(), 0);
 }
