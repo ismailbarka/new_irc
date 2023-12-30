@@ -39,8 +39,9 @@ void Server::handleKickCommand(std::string params, int i, std::map<std::string, 
 			std::vector<int>::iterator it = std::find(channelIt->second.clientsFd.begin(), channelIt->second.clientsFd.end(), client_fd);
 			if (it != channelIt->second.clientsFd.end()) {
 				channelIt->second.clientsFd.erase(it);
-				std::string reponse = ": " + ClientsMap[_pfds[i].fd].getNickname() + " kiked\n";// need to edit this message
+				std::string reponse = ":" + ClientsMap[_pfds[i].fd].getNickname() + " KICK " + channelName + " " + userName + "\r\n";// need to edit this message
 				send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
+				send(client_fd, reponse.c_str(), reponse.length(), 0);
 				std::cout << "kicked!\n";
 			} else {
 				std::string reponse = "476 " + ClientsMap[_pfds[i].fd].getNickname() + " the user is not in the channel\n";
