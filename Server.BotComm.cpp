@@ -1,12 +1,17 @@
 #include "Server.hpp"
+#include <ctime>
 
 void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
 {
-
     if(params == "TIME" || params == "TIME\n")
     {
-        std::string str = ":BOT PRIVMSG " + ClientsMap[_pfds[i].fd].getNickname() + " " + params + "\n";
-        send(_pfds[i].fd, str.c_str(), str.length(), 0);
+        std::time_t nowTime = std::time(NULL);
+        char timeChar[6];
+        std::strftime(timeChar, sizeof(timeChar),"%H:%M", std::localtime(&nowTime));
+        std::string timestr = "" + std::string(timeChar) + "\n";
+        std::cout << timestr;
+        std::string msg = ":BOT PRIVMSG " + ClientsMap[_pfds[i].fd].getNickname() + " Current_Time_is:" + timestr;
+        send(_pfds[i].fd, msg.c_str(), msg.length(), 0);
     }
     else if(params == "MAN" || params == "MAN\n")
     {
