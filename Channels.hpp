@@ -4,39 +4,28 @@
 #include "Server.hpp"
 class Channels
 {
-private:
-public:
-    std::vector<int> clientsFd;
-    std::string password;
-    bool havePassword;
-    std::string topic;
-    Channels()
-    {
-        topic = "no topic yet\n";
-    };
-    Channels(bool _havePassword)
-    {
-        havePassword = _havePassword;
-        topic = "no topic yet\n";
-    };
-    ~Channels(){}
-    void addClient(int _clientFd)
-    {
-        std::vector<int>::iterator it = clientsFd.begin();
-        while(it != clientsFd.end() && *it != _clientFd)
-            it++;
-        if (it == clientsFd.end())
-            clientsFd.push_back(_clientFd);
-    }
-    std::vector<int> getClientFd()
-    {
-        return clientsFd;
-    }
-	std::vector<int>  & getClientsFd()
-	{
-		return clientsFd;
-	}
+	private:
+	public:
+		std::vector<int> clientsFd;
+		std::vector<Client> operators;
+		std::vector<Client> invited;
+		std::string mode;
+		std::string password;
+    	std::string topic;
+		std::string limit;
+    	bool havePassword;
+		Channels();
+		Channels(bool _havePassword);
+		~Channels();
+		std::string getMode();
+		void setKey(std::string _key);
+		void setLimit(std::string _limit);
+		void addClient(int _clientFd);
+		void setMode(std::string _mode);
+		void removeClient(int _clientFd);
+		bool isOperator(int _clientFd);
+		// std::vector<int> getClientFd();
+		// std::vector<int>  & getClientsFd();
 };
-
 
 #endif
