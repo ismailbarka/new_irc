@@ -106,12 +106,12 @@ public:
 	Server(char **av);
 	void bindSocket();
 	void listenSocket();
-	void sendMagTomembers(std::string msg, std::vector<int> clientFd);
 	void setPollfd();
 	void setPollfd(struct pollfd _pfd);
 	void setPollfd(struct pollfd _pfd, int index);
 	void welcomeMessage(int i);
 	void handleNickCommand(std::string params, int i);
+	void handleBotCommand(std::string params, int i, struct pollfd _pfds[]);
 	void handleUserCommand(std::string params, int i);
 	void handleJoinCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void handleListCommand(int i, int clients_numbers);
