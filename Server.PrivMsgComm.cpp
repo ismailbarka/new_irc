@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:41:43 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/27 10:13:54 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/31 09:53:44 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,10 @@ void Server::handlePrivMsg(std::string params, int i, std::map<std::string,Chann
 				break ;
 			}
 		}
-		if (it == ClientsMap.end()) {
+		if (target == "BOT") {
+			handleBotCommand(message, i, _pfds);
+		}
+		else if (it == ClientsMap.end()) {
 			std::string response = "401 " + ClientsMap[_pfds[i].fd].getNickname() + " Error sending messgae, no such nick: [ " + target + " ]\n";
 			std::cout << "response: " << response << std::endl;
 			send(_pfds[i].fd, response.c_str(), response.length(), 0);

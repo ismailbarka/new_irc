@@ -39,7 +39,7 @@ void Server::handleTopicCommand(std::string params, int i, std::map<std::string,
 				break;
 			itOp++;
 		}
-		if (itOp == it->second.operators.end() && (it->second.mode[0] == '+' && it->second.mode.find('t') != std::string::npos))
+		if (itOp == it->second.operators.end() && it->second.mode.find('t') != std::string::npos)
 		{
 			std::string response = "482 " + ClientsMap[_pfds[i].fd].getNickname() + " " + channelName + " :You're not channel operator\n";
 			send(_pfds[i].fd, response.c_str(), response.length(), 0);

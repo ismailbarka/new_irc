@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:42:48 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/27 13:55:42 by tmoumni          ###   ########.fr       */
+/*   Updated: 2023/12/31 10:31:29 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,6 @@ void Server::handleModeCommand(std::string params,int i,std::map<std::string, Ch
 				return;
 			}
 			//set channel mode
-			it->second.setMode(mode);
-			
 			if (mode.find("k") != std::string::npos)
 			{
 				std::string key = target.substr(0, target.find("\r"));
