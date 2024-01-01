@@ -18,7 +18,7 @@ void Server::handleInviteCommand(std::string params, int i, std::map<std::string
     std::map<std::string, Channels>::iterator channelIt = channelsV.find(channelName);
     if (channelIt == channelsV.end())
     {
-        std::string reponse = "403 " + ClientsMap[_pfds[i].fd].getNickname() +  " channel not found\n\n";
+        std::string reponse = "403 " + ClientsMap[_pfds[i].fd].getNickname() +  " channel not found\r\n";
         send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
         std::cout << "channel not found\n";
     }
@@ -27,31 +27,31 @@ void Server::handleInviteCommand(std::string params, int i, std::map<std::string
         int client_fd = nameTofd(nickName);
         if (client_fd == -1)
         {
-            std::string reponse = "476 " + ClientsMap[_pfds[i].fd].getNickname() +  " the user is not in the channel-Server\n";
+            std::string reponse = "476 " + ClientsMap[_pfds[i].fd].getNickname() +  " the user is not in the channel-Server\r\n";
             send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
             std::cout << "the user is not in the channel-Server\n";
             return;
         }
         if (_pfds[i].fd != *channelIt->second.clientsFd.begin())
         {
-            std::string reponse = "482 " + ClientsMap[_pfds[i].fd].getNickname() + " :You're not channel operator\n";
+            std::string reponse = "482 " + ClientsMap[_pfds[i].fd].getNickname() + " :You're not channel operator\r\n";
             send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
             std::cout << "the user is not an admin\n";
             return;
         }
         std::vector<int>::iterator it = std::find(channelIt->second.clientsFd.begin(), channelIt->second.clientsFd.end(), client_fd);
         if (it != channelIt->second.clientsFd.end()) {
-            std::string reponse = "443 " + ClientsMap[_pfds[i].fd].getNickname() + " the user already in the channel\n";
+            std::string reponse = "443 " + ClientsMap[_pfds[i].fd].getNickname() + " the user already in the channel\r\n";
             send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
             std::cout << "the user already in the channel\n";
             return;
         }
         else
         {
-            std::string reponse = "341 " + ClientsMap[_pfds[i].fd].getNickname() + " " + nickName + " " + channelName + "\n";
+            std::string reponse = "341 " + ClientsMap[_pfds[i].fd].getNickname() + " " + nickName + " " + channelName + "\r\n";
 			std::cout << "reponse: " << reponse << std::endl;
 			send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
-			reponse = ":" + ClientsMap[_pfds[i].fd].getNickname() + " INVITE " + nickName + " " + channelName + "\n";
+			reponse = ":" + ClientsMap[_pfds[i].fd].getNickname() + " INVITE " + nickName + " " + channelName + "\r\n";
 			std::cout << "reponse: " << reponse << std::endl;
 			send(client_fd, reponse.c_str(), reponse.length(), 0);
             std::cout << "add success\n";

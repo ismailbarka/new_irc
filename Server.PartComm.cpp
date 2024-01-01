@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/26 11:54:49 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/27 10:36:41 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/01 14:46:26 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,13 @@ void Server::handlePartCommand(std::string params, int i, std::map<std::string, 
 			it1++;
 		if (it1 == it->second.clientsFd.end())
 		{
-			std::string resp = "ERROR YOU ARE NOT IN THIS CHANNEL [" + channel.substr(channel.find("#") + 1) + "]\n";
+			std::string resp = "ERROR YOU ARE NOT IN THIS CHANNEL [" + channel.substr(channel.find("#") + 1) + "]\r\n";
 			std::cout << "response: " << resp;
 			if (send(_pfds[i].fd, resp.c_str(), resp.length(), 0) == -1)
 				throw sendException();
 		} else {
 			it->second.removeClient(_pfds[i].fd);
-			std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PART " + channel + " :" + msg + "\n";
+			std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PART " + channel + " :" + msg + "\r\n";
 			std::cout << "response: " << resp << std::endl;
 			std::vector<int> clientFds = it->second.clientsFd;
 			std::vector<int>::iterator it1 = clientFds.begin();
@@ -51,7 +51,7 @@ void Server::handlePartCommand(std::string params, int i, std::map<std::string, 
 			}
 		}
 	} else {
-		std::string resp = "403 " + ClientsMap[_pfds[i].fd].getNickname() + " :" + channel +" No such channel\n";
+		std::string resp = "403 " + ClientsMap[_pfds[i].fd].getNickname() + " :" + channel +" No such channel\r\n";
 		std::cout << "response: " << resp;
 		if (send(_pfds[i].fd, resp.c_str(), resp.length(), 0) == -1)
 			throw sendException();

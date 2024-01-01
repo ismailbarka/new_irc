@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server.BotComm.cpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/01/01 10:10:23 by tmoumni           #+#    #+#             */
+/*   Updated: 2024/01/01 14:25:39 by tmoumni          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Server.hpp"
 
 void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
@@ -10,7 +22,7 @@ void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
         std::strftime(timeChar, sizeof(timeChar),"%H:%M", std::localtime(&nowTime));
         std::string timestr = "" + std::string(timeChar) + "\n";
         std::cout << timestr;
-        std::string msg = ":BOT PRIVMSG " + ClientsMap[_pfds[i].fd].getNickname() + " Current_Time_is:" + timestr;
+        std::string msg = ":BOT PRIVMSG " + ClientsMap[_pfds[i].fd].getNickname() + " :Current Time is: " + timestr;
         send(_pfds[i].fd, msg.c_str(), msg.length(), 0);
     }
     else if (params == "MAN" || params == "MAN\n")
@@ -29,12 +41,15 @@ void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
 					man += tr + "*___+_o:_Give/take_channel_operator_privilege______________________________________*\r\n";
 					man += tr + "*___+_l:_Set/remove_the_user_limit_to_channel______________________________________*\r\n";
 					man += tr + "************************************************************************************\r\n";
-            std::cout << man;
-            send(_pfds[i].fd, man.c_str(), man.length(), 0);
+        std::cout << man;
+        send(_pfds[i].fd, man.c_str(), man.length(), 0);
+		system("open https://www.youtube.com/watch?v=QH2-TGUlwu4");
     }
     else
     {
-        std::string str = tr + " Unknown BOT command: " + params + "\r\n";
+        std::string str = tr + " Available commands:\r\n";
+        str += tr + " /BOT MAN\r\n";
+        str += tr + " /BOT TIME\r\n";
         send(_pfds[i].fd,str.c_str(), str.length(), 0);
     }
 }

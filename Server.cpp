@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/31 10:02:32 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/01 15:42:46 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void Server::welcomeMessage(int i)
 	if (ClientsMap[_pfds[i].fd].getIsAutonticated())
 	{
 		std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Welcome to the Internet Relay Network\n";
-		response += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You are now logged in as [ " + ClientsMap[_pfds[i].fd].getNickname() + " ]\n";
+		response += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You are now logged in as [ " + ClientsMap[_pfds[i].fd].getNickname() + " ]\r\n";
 		// response += "002 " + ClientsMap[_pfds[i].fd].getNickname() + " :your host is " + std::string(hostname) + ", running version 1.0\n";
 		std::cout << "response: " << response << std::endl;
 		send(_pfds[i].fd, response.c_str(), response.length(), 0);
@@ -147,6 +147,7 @@ void Server::startServer()
 			setPollfd(client, clients_numbers);
 			Client newClient(client);
 			newClient.setClientIp(client_ip);
+			newClient.setClientHost(hostname);
 			ClientsMap.insert(std::pair<int, Client>(clientSocket, newClient));
 			clients_numbers++;
 			// std::string response = "251 * MG Welcome to our IRC server, please enter nickname, username and password\n";
@@ -189,8 +190,8 @@ void Server::startServer()
 					}
 				} else if (readed > 0) {
 					buffer[readed] = '\0';
-					std::cout << "\n==> received: [" << buffer << "]" << std::endl;
-					message+=buffer;
+					std::cout << GREEN << "\n==> received: [" << buffer << "]" << RESET << std::endl;
+					message += buffer;
 					size_t checknewline = message.find('\n');
 					if(checknewline != std::string::npos)
 					{
@@ -218,12 +219,12 @@ void Server::startServer()
 								ClientsMap[_pfds[i].fd].setIsAutonticated();
 								welcomeMessage(i);
 							} else {
-								std::string response = "464 " + ClientsMap[_pfds[i].fd].getNickname() + " :Password incorrect\n";
+								std::string response = "464 " + ClientsMap[_pfds[i].fd].getNickname() + " :Password incorrect\r\n";
 								std::cout << "response: " << response << std::endl;
 								send(_pfds[i].fd, response.c_str(), response.length(), 0);
 							}
 						} else if (command == "PONG") {
-							std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :PING\n";
+							std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :PING\r\n";
 							std::cout << "response: " << response << std::endl;
 							send(_pfds[i].fd, response.c_str(), response.length(), 0);
 						} else if (command == "NICK") {
@@ -234,7 +235,7 @@ void Server::startServer()
 							handleQuitCommand(i, clients_numbers);
 						} else if (ClientsMap[_pfds[i].fd].getIsAutonticated()) {
 							if (command == "PASS" || command == "PASS\n") {
-								std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": You are already registered with a password\n";
+								std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": You are already registered with a password\r\n";
 								std::cout << "response: " << response << std::endl;
 								send(_pfds[i].fd, response.c_str(), response.length(), 0);
 							} else if (command == "PRIVMSG") {
@@ -256,18 +257,18 @@ void Server::startServer()
 							} else if (command == "PART" || command == "PART\n") {
 								handlePartCommand(params, i, channelsV, _pfds);
 							} else {
-								std::string response = "421 " + ClientsMap[_pfds[i].fd].getNickname() + " :Unknown command: " + command + "\n";
+								std::string response = "421 " + ClientsMap[_pfds[i].fd].getNickname() + " :Unknown command: " + command + "\r\n";
 								std::cout << "response: " << response << std::endl;
 								send(_pfds[i].fd, response.c_str(), response.length(), 0);
 							}
 						} else {
-							std::string response = "ERROR you need to be autonticated first\n";
+							std::string response = "ERROR you need to be autonticated first\r\n";
 							if (ClientsMap[_pfds[i].fd].getNickname().empty())
 								response += "ERROR you need to set a nickname !\n";
 							if (ClientsMap[_pfds[i].fd].getUserName().empty())
 								response += "ERROR you need to set a username !\n";
 							if (ClientsMap[_pfds[i].fd].getCorrectPassWord() == false)
-								response += "ERROR you need to enter the server password !\n";
+								response += "ERROR you need to enter the server password !\r\n";
 							std::cout << "response: " << response << std::endl;
 							send(_pfds[i].fd, response.c_str(), response.length(), 0);
 						}

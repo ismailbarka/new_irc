@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:40:47 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/21 10:41:24 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/01 14:46:46 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void Server::handleQuitCommand(int i, int & clients_numbers)
 {
-	std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Bye Bye " + ClientsMap[_pfds[i].fd].getNickname() + "\n";
+	std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Bye Bye " + ClientsMap[_pfds[i].fd].getNickname() + "\r\n";
 	std::cout << "response: " << response << std::endl;
 	send(_pfds[i].fd, response.c_str(), response.length(), 0);
 	std::cout << "client disconnected: " << ClientsMap[_pfds[i].fd].getNickname() << std::endl;

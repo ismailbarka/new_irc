@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:34:52 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/21 10:36:33 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/01 14:45:54 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@ void Server::handleNickCommand(std::string params, int i)
 	if (params.empty())
 	{
 		std::cout << "Invalid NickName" << std::endl;
-		std::string resp = "431 * Invalid NickName!\n";
+		std::string resp = "431 * Invalid NickName!\r\n";
 		send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 		return;
 	}
 	if (ClientsMap.find(_pfds[i].fd) != ClientsMap.end() && ClientsMap[_pfds[i].fd].getIsAutonticated()) {
-		std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": You are already registered with a nickname\n";
+		std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": You are already registered with a nickname\r\n";
 		std::cout << "response: " << response << std::endl;
 		send(_pfds[i].fd, response.c_str(), response.length(), 0);
 		return;
@@ -36,7 +36,7 @@ void Server::handleNickCommand(std::string params, int i)
 		if (it->second.getNickname() == nickName)
 		{
 			check = false;
-			std::string resp = "433 * nickName already used\n";
+			std::string resp = "433 * nickName already used\r\n";
 			std::cout << resp;
 			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 		}

@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 11:02:31 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/26 15:57:13 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/01 15:49:12 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ class Client
 		struct pollfd pFd;
 		std::string nickName;
 		std::string userName;
+		std::string realName;
 		bool isAutonticated;
 		std::vector<std::string> commandList;
 		bool correctPassword;
@@ -43,6 +44,7 @@ class Client
 		void setPollfd(struct pollfd _pFd);
 		void setNickname(std::string _nickName);
 		void setuserName(std::string _userName);
+		void setRealName(std::string _realName);
 		std::string getNickname();
 		std::string getUserName();
 		bool getIsAutonticated();
