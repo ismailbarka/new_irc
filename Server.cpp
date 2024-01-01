@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/01 15:42:46 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/01 16:13:22 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,11 +206,11 @@ void Server::startServer()
 							params = message.substr(pos + 1);
 						else
 							params = "";
+						std::cout << RED << "params: [" << params << "]" << RESET << std::endl;
 						params = params.substr(0, params.find("\n"));
 						params = params.substr(0, params.find("\r"));
 						std::cout << "command: [" << command << "]" << std::endl;
 						std::cout << "params: [" << params << "]" << std::endl;
-						// split params userName 0 * NickName
 						if ((command == "PASS" || command == "PASS\n") && !ClientsMap[_pfds[i].fd].getIsAutonticated()) {
 							std::string password = params.substr(0, params.find("\r"));
 							std::cout << "password: " << password << std::endl;

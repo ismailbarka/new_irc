@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:37:01 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/01 15:52:33 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/01 16:10:48 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,6 @@
 
 void Server::handleUserCommand(std::string params, int i) {
 	params = trimString(params);
-	std::cout << "====> USER params: " << params << std::endl;
-	if (ClientsMap[_pfds[i].fd].getNickname().empty())
-	{
-		std::string response = "ERROR you need to set a nickname first\r\n";
-		std::cout << "response: " << response << std::endl;
-		send(_pfds[i].fd, response.c_str(), response.length(), 0);
-		return;
-	}
 	if (ClientsMap.find(_pfds[i].fd) != ClientsMap.end() && ClientsMap[_pfds[i].fd].getIsAutonticated()) {
 		std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": You are already registered with a username\r\n";
 		std::cout << "response: " << response << std::endl;
@@ -45,23 +37,9 @@ void Server::handleUserCommand(std::string params, int i) {
 		send(_pfds[i].fd, response.c_str(), response.length(), 0);
 		return;
 	}
-	bool check = true;
-	for (std::map<int, Client>::iterator it = ClientsMap.begin(); it != ClientsMap.end(); it++)
-	{
-		if (it->second.getUserName() == userName)
-		{
-			check = false;
-			std::string resp = "ERROR userName already used\r\n";
-			std::cout << resp;
-			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
-		}
-	}
-	if (check)
-	{
-		ClientsMap[_pfds[i].fd].setuserName(userName);
-		ClientsMap[_pfds[i].fd].setIsAutonticated();
-		ClientsMap[_pfds[i].fd].setRealName(realName);
-		std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
-		welcomeMessage(i);
-	}
+	ClientsMap[_pfds[i].fd].setuserName(userName);
+	ClientsMap[_pfds[i].fd].setIsAutonticated();
+	ClientsMap[_pfds[i].fd].setRealName(realName);
+	std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
+	welcomeMessage(i);
 }
