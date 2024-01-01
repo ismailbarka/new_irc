@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/30 09:43:18 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/01 16:53:40 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@
 
 # define GREEN "\033[32m"
 # define RED "\033[31m"
+# define BLUE "\033[34m"
+# define YELLOW "\033[33m"
 # define RESET "\033[0m"
 
 

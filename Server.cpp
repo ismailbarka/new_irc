@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/01 16:13:22 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/01 16:54:11 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,8 +177,6 @@ void Server::startServer()
 					{
 						std::cout << "POLLHUP" << std::endl;
 						buffer[5] = '\0';
-						std::string message1(buffer);
-						std::cout << "message1: " << message1 << std::endl;
 						std::cout << "client disconnected: " << ClientsMap[_pfds[i].fd].getNickname() << std::endl;
 						std::cout << "buffer: [" << buffer << "]" << std::endl;
 						ClientsMap.erase(_pfds[i].fd);
@@ -192,6 +190,7 @@ void Server::startServer()
 					buffer[readed] = '\0';
 					std::cout << GREEN << "\n==> received: [" << buffer << "]" << RESET << std::endl;
 					message += buffer;
+					std::cout << BLUE << "1 =======> message: [" << message << "]" << RESET << std::endl;
 					size_t checknewline = message.find('\n');
 					if(checknewline != std::string::npos)
 					{
@@ -206,6 +205,7 @@ void Server::startServer()
 							params = message.substr(pos + 1);
 						else
 							params = "";
+						std::cout << BLUE << "2 =======> message: [" << message << "]" << RESET << std::endl;
 						std::cout << RED << "params: [" << params << "]" << RESET << std::endl;
 						params = params.substr(0, params.find("\n"));
 						params = params.substr(0, params.find("\r"));
