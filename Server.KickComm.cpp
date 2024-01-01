@@ -12,7 +12,7 @@ void Server::handleKickCommand(std::string params, int i, std::map<std::string, 
 		std::map<std::string, Channels>::iterator channelIt = channelsV.find(channelName);
 		if(channelIt == channelsV.end())
 		{
-			std::string reponse = "403 " + ClientsMap[_pfds[i].fd].getNickname() +  " channel not found\n\n";
+			std::string reponse = "403 " + ClientsMap[_pfds[i].fd].getNickname() +  " channel not found\r\n";
 			send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
 			std::cout << "channel not found\n";
 		}
@@ -21,7 +21,7 @@ void Server::handleKickCommand(std::string params, int i, std::map<std::string, 
 			int client_fd = nameTofd(userName);
 			if(client_fd == -1)
 			{
-				std::string reponse = "476 " + ClientsMap[_pfds[i].fd].getNickname() +  " the user is not in the channel\n";
+				std::string reponse = "476 " + ClientsMap[_pfds[i].fd].getNickname() +  " the user is not in the channel\r\n";
 				send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
 				std::cout << "the user is not in the channel\n";
 				return;
@@ -30,7 +30,7 @@ void Server::handleKickCommand(std::string params, int i, std::map<std::string, 
 			std::cout << "*channelIt->second.clientsFd.begin() = " << *channelIt->second.clientsFd.begin() << std::endl;
 			if(_pfds[i].fd != *channelIt->second.clientsFd.begin())
 			{
-				std::string reponse = "442 " + ClientsMap[_pfds[i].fd].getNickname() + " you are not an admin\n";
+				std::string reponse = "442 " + ClientsMap[_pfds[i].fd].getNickname() + " you are not channel operator\r\n";
 				send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
 				std::cout << "the user is not an admin\n";
 				return;
@@ -44,7 +44,7 @@ void Server::handleKickCommand(std::string params, int i, std::map<std::string, 
 				send(client_fd, reponse.c_str(), reponse.length(), 0);
 				std::cout << "kicked!\n";
 			} else {
-				std::string reponse = "476 " + ClientsMap[_pfds[i].fd].getNickname() + " the user is not in the channel\n";
+				std::string reponse = "476 " + ClientsMap[_pfds[i].fd].getNickname() + " the user is not in the channel\r\n";
 				send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
 				std::cout << "Element not found in channel client" << std::endl;
 				return ;

@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 11:02:19 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/26 15:57:32 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/01 15:49:17 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,11 @@ void Client::setNickname(std::string _nickName)
 void Client::setuserName(std::string _userName)
 {
 	userName = _userName;
+}
+
+void Client::setRealName(std::string _realName)
+{
+	realName = _realName;
 }
 
 std::string Client::getNickname()

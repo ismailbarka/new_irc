@@ -48,8 +48,8 @@ void Server::firstJoin(std::string key, std::string value, bool pass, int i, std
 		send(*it, resp.c_str(), resp.length(), 0);
 		it++;
 	}
-	resp = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have sucssefully JOINED " + key + "\n";
-	resp += "332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :" + channel.topic + "\n";
+	resp = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have sucssefully JOINED " + key + "\r\n";
+	resp += "332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :" + channel.topic + "\r\n";
 	send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 }
 
@@ -64,7 +64,7 @@ void Server::joinChannel(std::string key, int i, std::map<std::string, Channels>
 	if (it->second.mode.find("i") != std::string::npos && it1 == it->second.invited.end())
 	{
 		//tell him that he can't join this channel because it's invite only
-		std::string resp = "473 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :Cannot join channel (+i)\n";
+		std::string resp = "473 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :Cannot join channel (+i)\r\n";
 		std::cout << "response: " << resp;
 		send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 		return;
@@ -94,7 +94,7 @@ void Server::joinChannel(std::string key, int i, std::map<std::string, Channels>
 		it2++;
 	}
 	resp2 = "332 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :" + it->second.topic + "\r\n";
-	resp2 += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have sucssefully JOINED " + key + "\n";						
+	resp2 += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have sucssefully JOINED " + key + "\r\n";						
 	send(_pfds[i].fd, resp2.c_str(), resp2.length(), 0);
 	if (it1 != it->second.invited.end())
 		it->second.invited.erase(it1);
@@ -134,11 +134,11 @@ void Server::handleJoinCommand(std::string params, int i, std::map<std::string, 
 						it1++;
 					if (it1 != it->second.clientsFd.end())
 					{
-						std::string resp = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have already JOINED " + key + "\n";
+						std::string resp = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have already JOINED " + key + "\r\n";
 			 			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 					} else {
 						if (value != it->second.password) {
-							std::string resp = "475 " + ClientsMap[_pfds[i].fd].getNickname() + " incorrect password " + "\n";
+							std::string resp = "475 " + ClientsMap[_pfds[i].fd].getNickname() + " incorrect password " + "\r\n";
 							send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 							std::cout << "encorrect password\n";
 						} else {
@@ -161,7 +161,7 @@ void Server::handleJoinCommand(std::string params, int i, std::map<std::string, 
 						it1++;
 					if (it1 != it->second.clientsFd.end())
 					{
-						std::string resp = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have already JOINED " + key + "\n";
+						std::string resp = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You have already JOINED " + key + "\r\n";
 			 			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 					} else {
 						joinChannel(key, i, channelsV);

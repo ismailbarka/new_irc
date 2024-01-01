@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:41:43 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/31 09:53:44 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/01 15:35:04 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void Server::handlePrivMsg(std::string params, int i, std::map<std::string,Chann
 		std::map<std::string,Channels>::iterator it = channelsV.find(target);
 		if (it == channelsV.end())
 		{
-			std::string resp = "403 " + ClientsMap[_pfds[i].fd].getNickname() + " :YOU NEED TO CREATE/JOIN THIS CHANNEL FIRST: " + target + "\n";
+			std::string resp = "403 " + ClientsMap[_pfds[i].fd].getNickname() + " " + target + " No such nick/channel\r\n";
 			std::cout << "response: " << resp;
 			if (send(_pfds[i].fd, resp.c_str(), resp.length(), 0) == -1)
 				throw sendException();
@@ -38,7 +38,7 @@ void Server::handlePrivMsg(std::string params, int i, std::map<std::string,Chann
 				it1++;
 			if (it1 == it->second.clientsFd.end())
 			{
-				std::string resp = "ERROR YOU ARE NOT IN THIS CHANNEL [" + target.substr(target.find("#") + 1) + "]\n";
+				std::string resp = "404 " + ClientsMap[_pfds[i].fd].getNickname() + " " + target + " Cannot send to nick/channel\r\n";
 				std::cout << "response: " << resp;
 				if (send(_pfds[i].fd, resp.c_str(), resp.length(), 0) == -1)
 					throw sendException();
@@ -49,7 +49,7 @@ void Server::handlePrivMsg(std::string params, int i, std::map<std::string,Chann
 			{
 				std::map<int, Client>::iterator itt = ClientsMap.find(*it1);
 				if (itt->second.getIsAutonticated() == true && itt->second.getNickname() != sender) {
-					std::string resp = ":" + sender + " PRIVMSG " + target + " :" + message + "\n";
+					std::string resp = ":" + sender + " PRIVMSG " + target + " :" + message + "\r\n";
 					std::cout << "response: " << resp << std::endl;
 					if (send(*it1, resp.c_str(), resp.length(), 0) == -1)
 						throw sendException();
@@ -61,7 +61,7 @@ void Server::handlePrivMsg(std::string params, int i, std::map<std::string,Chann
 		std::map<int, Client>::iterator it;
 		for (it = ClientsMap.begin(); it != ClientsMap.end(); it++) {
 			if (it->second.getIsAutonticated() && it->second.getNickname() == target) {
-				std::string response = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PRIVMSG " + target + " :" + message + "\n";
+				std::string response = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" + ClientsMap[_pfds[i].fd]._client_host +" PRIVMSG " + target + " :" + message + "\r\n";
 				std::cout << "response: " << response << std::endl;
 				if (send(it->first, response.c_str(), response.length(), 0) == -1)
 					throw sendException();
@@ -72,7 +72,7 @@ void Server::handlePrivMsg(std::string params, int i, std::map<std::string,Chann
 			handleBotCommand(message, i, _pfds);
 		}
 		else if (it == ClientsMap.end()) {
-			std::string response = "401 " + ClientsMap[_pfds[i].fd].getNickname() + " Error sending messgae, no such nick: [ " + target + " ]\n";
+			std::string response = "401 " + ClientsMap[_pfds[i].fd].getNickname() + " " + target + " Error sending messgae, no such nick\r\n";
 			std::cout << "response: " << response << std::endl;
 			send(_pfds[i].fd, response.c_str(), response.length(), 0);
 		}
