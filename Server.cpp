@@ -32,6 +32,18 @@ Server::~Server()
 	std::cout << "Server destroyed" << std::endl;
 }
 
+int Server::nameTofd(std::string nickName)
+{
+	std::map<int, Client>::iterator it = ClientsMap.begin();
+	while(it != ClientsMap.end())
+	{
+		if(it->second.getNickname() == nickName)
+			return it->first;
+		it++;
+	}
+	return -1;
+}
+
 Server::Server(char **av)
 {
 	_password = av[2];
@@ -103,6 +115,71 @@ void Server::setPollfd(struct pollfd _pfd)
 void Server::setPollfd(struct pollfd _pfd, int index)
 {
 	_pfds[index] = _pfd;
+}
+
+void Server::commands(std::string command,std::string params, std::map<int, Client> ClientsMap, int i, int clients_numbers, struct pollfd _pfds[])
+{
+	if ((command == "PASS" || command == "PASS\n") && !ClientsMap[_pfds[i].fd].getIsAutonticated()) {
+			std::string password = params.substr(0, params.find("\r"));
+			std::cout << "password: " << password << std::endl;
+			if (password == _password) {
+				ClientsMap[_pfds[i].fd].setCorrectPassWord(true);
+				ClientsMap[_pfds[i].fd].setIsAutonticated();
+				welcomeMessage(i);
+			} else {
+				std::string response = "464 " + ClientsMap[_pfds[i].fd].getNickname() + " :Password incorrect\r\n";
+				std::cout << "response: " << response << std::endl;
+				send(_pfds[i].fd, response.c_str(), response.length(), 0);
+			}
+		} else if (command == "PONG") {
+			std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :PING\r\n";
+			std::cout << "response: " << response << std::endl;
+			send(_pfds[i].fd, response.c_str(), response.length(), 0);
+		} else if (command == "NICK") {
+			handleNickCommand(params, i);
+		} else if (command == "USER") {
+			handleUserCommand(params, i);
+		} else if (command == "QUIT\n" || command == "QUIT") {
+			handleQuitCommand(i, clients_numbers, params);
+		} else if (ClientsMap[_pfds[i].fd].getIsAutonticated()) {
+			if (command == "PASS" || command == "PASS\n") {
+				std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": You are already registered with a password\r\n";
+				std::cout << "response: " << response << std::endl;
+				send(_pfds[i].fd, response.c_str(), response.length(), 0);
+			} else if (command == "PRIVMSG") {
+				handlePrivMsg(params, i,channelsV);
+			} else if (command == "LIST" || command == "LIST\n") {
+				handleListCommand(i, clients_numbers);
+			} else if (command == "JOIN" || command == "JOIN\n") {
+				handleJoinCommand(params, i, channelsV, _pfds);
+			} else if (command == "INVITE" || command == "INVITE\n") {
+				handleInviteCommand(params, i, channelsV, _pfds);
+			} else if (command == "TOPIC" || command == "TOPIC\n") {
+				handleTopicCommand(params, i, channelsV, _pfds);
+			} else if (command == "KICK" || command == "KICK\n") {
+				handleKickCommand(params, i, channelsV, _pfds);
+			} else if (command == "MODE" || command == "MODE\n") {
+				handleModeCommand(params, i, channelsV);
+			} else if (command == "BOT" || command == "BOT\n") {
+				handleBotCommand(params, i, _pfds);
+			} else if (command == "PART" || command == "PART\n") {
+				handlePartCommand(params, i, channelsV, _pfds);
+			} else {
+				std::string response = "421 " + ClientsMap[_pfds[i].fd].getNickname() + " :Unknown command: " + command + "\r\n";
+				std::cout << "response: " << response << std::endl;
+				send(_pfds[i].fd, response.c_str(), response.length(), 0);
+			}
+		} else {
+			std::string response = "ERROR you need to be autonticated first\r\n";
+			if (ClientsMap[_pfds[i].fd].getNickname().empty())
+				response += "ERROR you need to set a nickname !\n";
+			if (ClientsMap[_pfds[i].fd].getUserName().empty())
+				response += "ERROR you need to set a username !\n";
+			if (ClientsMap[_pfds[i].fd].getCorrectPassWord() == false)
+				response += "ERROR you need to enter the server password !\r\n";
+			std::cout << "response: " << response << std::endl;
+			send(_pfds[i].fd, response.c_str(), response.length(), 0);
+		}
 }
 
 void Server::startServer()
@@ -217,67 +294,7 @@ void Server::startServer()
 							params = params.substr(0, params.find("\r"));
 							std::cout << "command: [" << command << "]" << std::endl;
 							std::cout << "params: [" << params << "]" << std::endl;
-							if ((command == "PASS" || command == "PASS\n") && !ClientsMap[_pfds[i].fd].getIsAutonticated()) {
-								std::string password = params.substr(0, params.find("\r"));
-								std::cout << "password: " << password << std::endl;
-								if (password == _password) {
-									ClientsMap[_pfds[i].fd].setCorrectPassWord(true);
-									ClientsMap[_pfds[i].fd].setIsAutonticated();
-									welcomeMessage(i);
-								} else {
-									std::string response = "464 " + ClientsMap[_pfds[i].fd].getNickname() + " :Password incorrect\r\n";
-									std::cout << "response: " << response << std::endl;
-									send(_pfds[i].fd, response.c_str(), response.length(), 0);
-								}
-							} else if (command == "PONG") {
-								std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :PING\r\n";
-								std::cout << "response: " << response << std::endl;
-								send(_pfds[i].fd, response.c_str(), response.length(), 0);
-							} else if (command == "NICK") {
-								handleNickCommand(params, i);
-							} else if (command == "USER") {
-								handleUserCommand(params, i);
-							} else if (command == "QUIT\n" || command == "QUIT") {
-								handleQuitCommand(i, clients_numbers, params);
-							} else if (ClientsMap[_pfds[i].fd].getIsAutonticated()) {
-								if (command == "PASS" || command == "PASS\n") {
-									std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": You are already registered with a password\r\n";
-									std::cout << "response: " << response << std::endl;
-									send(_pfds[i].fd, response.c_str(), response.length(), 0);
-								} else if (command == "PRIVMSG") {
-									handlePrivMsg(params, i,channelsV);
-								} else if (command == "LIST" || command == "LIST\n") {
-									handleListCommand(i, clients_numbers);
-								} else if (command == "JOIN" || command == "JOIN\n") {
-									handleJoinCommand(params, i, channelsV, _pfds);
-								} else if (command == "INVITE" || command == "INVITE\n") {
-									handleInviteCommand(params, i, channelsV, _pfds);
-								} else if (command == "TOPIC" || command == "TOPIC\n") {
-									handleTopicCommand(params, i, channelsV, _pfds);
-								} else if (command == "KICK" || command == "KICK\n") {
-									handleKickCommand(params, i, channelsV, _pfds);
-								} else if (command == "MODE" || command == "MODE\n") {
-									handleModeCommand(params, i, channelsV);
-								} else if (command == "BOT" || command == "BOT\n") {
-									handleBotCommand(params, i, _pfds);
-								} else if (command == "PART" || command == "PART\n") {
-									handlePartCommand(params, i, channelsV, _pfds);
-								} else {
-									std::string response = "421 " + ClientsMap[_pfds[i].fd].getNickname() + " :Unknown command: " + command + "\r\n";
-									std::cout << "response: " << response << std::endl;
-									send(_pfds[i].fd, response.c_str(), response.length(), 0);
-								}
-							} else {
-								std::string response = "ERROR you need to be autonticated first\r\n";
-								if (ClientsMap[_pfds[i].fd].getNickname().empty())
-									response += "ERROR you need to set a nickname !\n";
-								if (ClientsMap[_pfds[i].fd].getUserName().empty())
-									response += "ERROR you need to set a username !\n";
-								if (ClientsMap[_pfds[i].fd].getCorrectPassWord() == false)
-									response += "ERROR you need to enter the server password !\r\n";
-								std::cout << "response: " << response << std::endl;
-								send(_pfds[i].fd, response.c_str(), response.length(), 0);
-							}
+							commands(command, params, ClientsMap, i, clients_numbers, _pfds);
 						}
 					}
 				}
