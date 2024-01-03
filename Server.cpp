@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/01 18:18:05 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/03 09:54:32 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,9 +64,12 @@ void Server::welcomeMessage(int i)
 	if (ClientsMap[_pfds[i].fd].getIsAutonticated())
 	{
 		std::string response = "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :Welcome to the Internet Relay Network\n";
-		response += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " You are now logged in as [ " + ClientsMap[_pfds[i].fd].getNickname() + " ]\r\n";
-		// response += "002 " + ClientsMap[_pfds[i].fd].getNickname() + " :your host is " + std::string(hostname) + ", running version 1.0\n";
-		std::cout << "response: " << response << std::endl;
+		response += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :- You are now logged in as [ " + ClientsMap[_pfds[i].fd].getNickname() + " ]\r\n";
+		response += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :- Your host is " + ClientsMap[_pfds[i].fd].getClientHost() + ", running version 1.0\r\n";
+		response += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :- Your IP is " + std::string(ClientsMap[_pfds[i].fd].ipAddress) + "\r\n";
+		response += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :- This server was created in 2023-12-15\r\n";
+		response += "001 " + ClientsMap[_pfds[i].fd].getNickname() + " :- There are " + std::to_string(ClientsMap.size()) + " user(s) and " + std::to_string(channelsV.size()) + " channel(s) on this server.\r\n";
+		std::cout << "response: " << response;
 		send(_pfds[i].fd, response.c_str(), response.length(), 0);
 	}
 }
@@ -204,6 +207,8 @@ void Server::startServer()
 							command = command.substr(0, command.find("\n"));
 							command = command.substr(0, command.find("\r"));
 							//Params
+							if (command.empty())
+								continue;
 							std::string params;
 							if (pos != std::string::npos)
 								params = line.substr(pos + 1);
