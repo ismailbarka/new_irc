@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/03 09:54:32 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/03 11:38:49 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,6 @@ void Server::startServer()
 					buffer[readed] = '\0';
 					std::cout << GREEN << "\n==> received: [" << buffer << "]" << RESET << std::endl;
 					line += buffer;
-					std::cout << BLUE << "1 =======> line: [" << line << "]" << RESET << std::endl;
 					size_t checknewline = line.find('\n');
 					if(checknewline != std::string::npos)
 					{
@@ -201,12 +200,10 @@ void Server::startServer()
 						std::stringstream ss(buffer);
 						while (std::getline(ss, line, '\n'))
 						{
-						//Command
 							size_t pos = line.find(" ");
 							std::string command = line.substr(0, pos);
 							command = command.substr(0, command.find("\n"));
 							command = command.substr(0, command.find("\r"));
-							//Params
 							if (command.empty())
 								continue;
 							std::string params;
@@ -241,7 +238,7 @@ void Server::startServer()
 							} else if (command == "USER") {
 								handleUserCommand(params, i);
 							} else if (command == "QUIT\n" || command == "QUIT") {
-								handleQuitCommand(i, clients_numbers);
+								handleQuitCommand(i, clients_numbers, params);
 							} else if (ClientsMap[_pfds[i].fd].getIsAutonticated()) {
 								if (command == "PASS" || command == "PASS\n") {
 									std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": You are already registered with a password\r\n";

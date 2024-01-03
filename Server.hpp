@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/01 16:53:40 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/03 12:26:34 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ public:
 	void handleUserCommand(std::string params, int i);
 	void handleJoinCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void handleListCommand(int i, int clients_numbers);
-	void handleQuitCommand(int i, int & clients_numbers);
+	void handleQuitCommand(int i, int & clients_numbers, std::string params);
 	void handlePrivMsg(std::string params, int i, std::map<std::string,Channels> &channelsV);
 	void handleModeCommand(std::string params,int i,std::map<std::string, Channels> & channelsV);
 	void handleInviteCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
@@ -128,7 +128,7 @@ public:
 	void handlePartCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void startServer();
 	void firstJoin(std::string key, std::string value, bool pass, int i, std::map<std::string, Channels> &channelsV);
-	void joinChannel(std::string key, int i, std::map<std::string, Channels> &channelsV);
+	void joinChannel(std::string key, int i, std::map<std::string, Channels> &channelsV, std::string value);
 	~Server();
 	int nameTofd(std::string nickName)
 	{
