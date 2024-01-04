@@ -6,11 +6,23 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:42:48 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/03 12:18:45 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/04 11:16:40 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+
+bool validNumber(std::string number)
+{
+	int i = 0;
+	while (number[i])
+	{
+		if (!isdigit(number[i]))
+			return false;
+		i++;
+	}
+	return true;
+}
 
 bool validMode(std::string mode)
 {
@@ -101,9 +113,9 @@ void Server::handleModeCommand(std::string params,int i,std::map<std::string, Ch
 			if (mode.find("l") != std::string::npos)
 			{
 				if (mode[0] == '+') {
-					if (target.empty())
+					if (target.empty() || !validNumber(target))
 					{
-						std::string resp = "461 " + ClientsMap[_pfds[i].fd].getNickname() + " MODE :Not enough parameters\r\n";
+						std::string resp = "461 " + ClientsMap[_pfds[i].fd].getNickname() + " MODE :Not enough/valid parameters\r\n";
 						std::cout << "response: " << resp;
 						send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 						return;

@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/03 11:38:49 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/04 11:28:07 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,13 @@ int Server::nameTofd(std::string nickName)
 
 Server::Server(char **av)
 {
+	if (!validNumber(av[1]) || std::atoi(av[1]) <= 0 || std::atoi(av[1]) > 65535)
+		throw std::string("Invalid port number");
+	std::stringstream ss(av[2]);
+	std::string password;
+	ss >> password;
+	if (password.size() < 5 || password.empty())
+		throw std::string("Invalid password, password should be at least 5 characters long, without spaces");
 	_password = av[2];
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (serverSocket < 0)

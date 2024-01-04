@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/03 12:26:34 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/04 11:15:33 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,6 @@ public:
 	int nameTofd(std::string nickName);
 };
 std::string trimString(const std::string& str);
-
+bool validNumber(std::string number);
 
 #endif

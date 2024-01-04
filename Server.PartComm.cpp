@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/26 11:54:49 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/01 14:46:26 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/04 10:32:40 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void Server::handlePartCommand(std::string params, int i, std::map<std::string, 
 			it1++;
 		if (it1 == it->second.clientsFd.end())
 		{
-			std::string resp = "ERROR YOU ARE NOT IN THIS CHANNEL [" + channel.substr(channel.find("#") + 1) + "]\r\n";
+			std::string resp = "442 " + ClientsMap[_pfds[i].fd].getNickname() + " :" + channel + " You're not on that channel\r\n";
 			std::cout << "response: " << resp;
 			if (send(_pfds[i].fd, resp.c_str(), resp.length(), 0) == -1)
 				throw sendException();

@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 10:10:23 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/01 14:25:39 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/04 10:35:00 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
 					man += tr + "************************************************************************************\r\n";
         std::cout << man;
         send(_pfds[i].fd, man.c_str(), man.length(), 0);
-		system("open https://www.youtube.com/watch?v=QH2-TGUlwu4");
     }
     else
     {
