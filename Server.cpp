@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/04 11:28:07 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/06 15:13:40 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,9 @@ Server::Server(char **av)
 		throw std::string("Invalid port number");
 	std::stringstream ss(av[2]);
 	std::string password;
-	ss >> password;
+	std::getline(ss, password, '\n');
 	if (password.size() < 5 || password.empty())
-		throw std::string("Invalid password, password should be at least 5 characters long, without spaces");
+		throw std::string("Invalid password, password should be at least 5 characters long");
 	_password = av[2];
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (serverSocket < 0)
