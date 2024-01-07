@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 10:10:23 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/04 10:35:00 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/06 16:22:02 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,18 +28,18 @@ void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
     else if (params == "MAN" || params == "MAN\n")
     {
 		std::string man = tr +  "************************************************************************************\r\n";
-					man += tr + "*_-_Set_UserName_:_USER_+_(your_username)__________________________________________*\r\n";
-					man += tr + "*_-_Set_NickName___:_NICK_+_(your_nickname)________________________________________*\r\n";
-					man += tr + "*_-_Join_a_channel_:_JOIN_+_#(channel_name_________________________________________*\r\n";
-					man += tr + "*_-_KICK_-_Eject_a_client_from_the_channe__________________________________________*\r\n";
-					man += tr + "*_-_INVITE_-_Invite_a_client_to_a_channel__________________________________________*\r\n";
-					man += tr + "*_-_TOPIC_-_Change_or_view_the_channel_topic_______________________________________*\r\n";
-					man += tr + "*_-_MODE_-_Change_the_channel's_mode:______________________________________________*\r\n";
-					man += tr + "*___+_i:_Set/remove_Invite-only_channel____________________________________________*\r\n";
-					man += tr + "*___+_t:_Set/remove_the_restrictions_of_the_TOPIC_command_to_channel_operators_____*\r\n";
-					man += tr + "*___+_k:_Set/remove_the_channel_key_(password)_____________________________________*\r\n";
-					man += tr + "*___+_o:_Give/take_channel_operator_privilege______________________________________*\r\n";
-					man += tr + "*___+_l:_Set/remove_the_user_limit_to_channel______________________________________*\r\n";
+					man += tr + "*   Set UserName   : USER + (your username)                                        *\r\n";
+					man += tr + "*   Set NickName   : NICK + (your nickname)                                        *\r\n";
+					man += tr + "*   Join a channel : JOIN + #(channel name                                         *\r\n";
+					man += tr + "*   KICK   Eject a client from the channe                                          *\r\n";
+					man += tr + "*   INVITE   Invite a client to a channel                                          *\r\n";
+					man += tr + "*   TOPIC   Change or view the channel topic                                       *\r\n";
+					man += tr + "*   MODE   Change the channel's mode:                                              *\r\n";
+					man += tr + "*     +i: Set/remove Invite-only channel                                           *\r\n";
+					man += tr + "*     +t: Set/remove the restrictions of the TOPIC command to channel operators    *\r\n";
+					man += tr + "*     +k: Set/remove the channel key (password)                                    *\r\n";
+					man += tr + "*     +o: Give/take channel operator privilege                                     *\r\n";
+					man += tr + "*     +l: Set/remove the user limit to channel                                     *\r\n";
 					man += tr + "************************************************************************************\r\n";
         std::cout << man;
         send(_pfds[i].fd, man.c_str(), man.length(), 0);

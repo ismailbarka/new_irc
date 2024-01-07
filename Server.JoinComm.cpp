@@ -32,7 +32,7 @@ bool valideParams(std::string keys, std::string values)
     return true;
 }
 
-void Server::firstJoin(std::string key, std::string value, bool pass, int i, std::map<std::string, Channels> &channelsV)
+void Server:: firstJoin(std::string key, std::string value, bool pass, int i, std::map<std::string, Channels> &channelsV)
 {
 	Channels channel;
 	channel.havePassword = pass;

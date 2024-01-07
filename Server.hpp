@@ -126,12 +126,21 @@ public:
 	void handleKickCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void handleTopicCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void handlePartCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
-	void commands(std::string command,std::string params, std::map<int, Client> ClientsMap, int i, int clients_numbers, struct pollfd _pfds[]);
 	void startServer();
 	void firstJoin(std::string key, std::string value, bool pass, int i, std::map<std::string, Channels> &channelsV);
 	void joinChannel(std::string key, int i, std::map<std::string, Channels> &channelsV, std::string value);
 	~Server();
-	int nameTofd(std::string nickName);
+	int nameTofd(std::string nickName)
+	{
+		std::map<int, Client>::iterator it = ClientsMap.begin();
+		while(it != ClientsMap.end())
+		{
+			if(it->second.getNickname() == nickName)
+				return it->first;
+			it++;
+		}
+		return -1;
+	}
 };
 std::string trimString(const std::string& str);
 bool validNumber(std::string number);

@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:37:01 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/01 16:10:48 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/06 16:19:29 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ void Server::handleUserCommand(std::string params, int i) {
 	std::string asterisk;
 	std::string realName;
 	ss >> userName >> zero >> asterisk >> realName;
+	if (realName.empty())
+		realName = ClientsMap[_pfds[i].fd].getNickname();
 	std::cout << "userName: " << userName << std::endl;
 	std::cout << "zero: " << zero << std::endl;
 	std::cout << "asterisk: " << asterisk << std::endl;
@@ -33,6 +35,7 @@ void Server::handleUserCommand(std::string params, int i) {
 	if (zero != "0" || asterisk != "*" || realName.empty() || userName.empty())
 	{
 		std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": Invalid USER command\r\n";
+		response += "exemple: USER <username> 0 * <realname>\r\n";
 		std::cout << "response: " << response << std::endl;
 		send(_pfds[i].fd, response.c_str(), response.length(), 0);
 		return;

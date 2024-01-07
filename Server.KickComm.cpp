@@ -1,5 +1,17 @@
 #include "Server.hpp"
 
+bool isOperator(int _fd, std::vector<Client> operators)
+{
+	std::vector<Client>::iterator it = operators.begin();
+	while(it != operators.end())
+	{
+		if(it->getfd() == _fd)
+			return true;
+		it++;
+	}
+	return false;
+}
+
 void Server::handleKickCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[])
 	{
 		std::cout << params << std::endl;
@@ -28,7 +40,7 @@ void Server::handleKickCommand(std::string params, int i, std::map<std::string, 
 			}
 			std::cout << "client_fd = " << client_fd << std::endl;
 			std::cout << "*channelIt->second.clientsFd.begin() = " << *channelIt->second.clientsFd.begin() << std::endl;
-			if(_pfds[i].fd != *channelIt->second.clientsFd.begin())
+			if(_pfds[i].fd != *channelIt->second.clientsFd.begin() && isOperator(_pfds[i].fd, channelIt->second.operators) == false)
 			{
 				std::string reponse = "442 " + ClientsMap[_pfds[i].fd].getNickname() + " you are not channel operator\r\n";
 				send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
