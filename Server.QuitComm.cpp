@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:40:47 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 16:29:58 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 17:35:38 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void Server::handleQuitCommand(int i, int & clients_numbers, std::string params)
 			}
 		}
 	}
-	std::cout << "client disconnected: " << ClientsMap[_pfds[i].fd].getNickname() << " -> " << _pfds[i].fd << std::endl;
+	// std::cout << "client disconnected: " << ClientsMap[_pfds[i].fd].getNickname() << " -> " << _pfds[i].fd << std::endl;
 	ClientsMap.erase(_pfds[i].fd);
 	close(_pfds[i].fd);
 	_pfds[i].fd = -1;

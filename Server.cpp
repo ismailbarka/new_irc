@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 17:01:09 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 17:35:30 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,8 +230,6 @@ void Server::startServer()
 							}
 							line.clear();
 						}
-					} else {
-						std::cout << RED << "line=> " << buffer << RESET << std::endl;
 					}
 				}
 			}

@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/07 10:39:46 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 16:54:32 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 17:35:18 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@ void Server::handlePassCommand(std::string params, int i)
 		ClientsMap[_pfds[i].fd].setIsAutonticated();
 		welcomeMessage(i);
 	} else {
-		std::string response = "464 " + ClientsMap[_pfds[i].fd].getNickname() + " :Password incorrect\r\n";
-		// std::cout << "response: " << response << std::endl;
+		std::string response = "464 * :Password incorrect\r\n";
+		// std::cout << "response: " << response << " : " << password << std::endl;
 		send(_pfds[i].fd, response.c_str(), response.length(), 0);
 	}
 }
