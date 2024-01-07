@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 11:10:17 by tmoumni           #+#    #+#             */
-/*   Updated: 2023/12/31 10:32:49 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 11:51:48 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,13 +93,27 @@ std::string Channels::getMode()
 	return mode;
 }
 
-void Channels::removeClient(int _clientFd)
+bool Channels::removeClient(int _clientFd)
 {
 	std::vector<int>::iterator it = clientsFd.begin();
 	while(it != clientsFd.end() && *it != _clientFd)
 		it++;
 	if (it != clientsFd.end())
+	{
 		clientsFd.erase(it);
+		return true;
+	}
+	return false;
+}
+
+bool Channels::haveClient(int _clientFd)
+{
+	std::vector<int>::iterator it = clientsFd.begin();
+	while(it != clientsFd.end() && *it != _clientFd)
+		it++;
+	if (it != clientsFd.end())
+		return true;
+	return false;
 }
 
 bool Channels::isOperator(int _clientFd)

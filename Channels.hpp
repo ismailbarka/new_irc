@@ -22,7 +22,8 @@ class Channels
 		void setLimit(std::string _limit);
 		void addClient(int _clientFd);
 		void setMode(std::string _mode);
-		void removeClient(int _clientFd);
+		bool removeClient(int _clientFd);
+		bool haveClient(int _clientFd);
 		bool isOperator(int _clientFd);
 		// std::vector<int> getClientFd();
 		// std::vector<int>  & getClientsFd();
