@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 14:58:44 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 16:02:03 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,6 +175,7 @@ void Server::startServer()
 	{
 		std::cout << RED << "=======> HELLO FROM SERVER <=======" << RESET << std::endl;
 		int pollResult = poll(_pfds, clients_numbers, -1); // poll will block the execution of the program until there is an event to handle (poll will return -1 if an error occured) (poll will return 0 if timeout occured) (poll will return the number of file descriptors ready for the requested operation if there is an event to handle)
+		//-1 passed to poll means that poll will block the execution of the program until there is an event to handle
 		std::cout << GREEN << "====> pollResult: " << pollResult << RESET << std::endl;
 		if (pollResult == -1) {
 			throw pollException();

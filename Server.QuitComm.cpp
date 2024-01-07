@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:40:47 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 13:35:16 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 16:18:06 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,12 @@ void Server::handleQuitCommand(int i, int & clients_numbers, std::string params)
 			if (it->second.haveClient(_pfds[i].fd))
 				handlePartCommand(it->first, i, channelsV, _pfds);
 		}
-		response = ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" 
-		+ std::string(ClientsMap[_pfds[i].fd].ipAddress) + " QUIT :" + params + "\r\n";
+		response = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" 
+		+ std::string(ClientsMap[_pfds[i].fd].ipAddress) + " QUIT " + params + "\r\n";
 		std::cout << "response: " << response << std::endl;
 		for (int j = 1; j < clients_numbers; j++)
 		{
-			if (_pfds[j].fd != -1 && _pfds[j].fd != _pfds[i].fd) {
+			if (_pfds[j].fd != -1) {
 				if (send(_pfds[j].fd, response.c_str(), response.length(), 0) == -1)
 					throw sendException();
 			}
