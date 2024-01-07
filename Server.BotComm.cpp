@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 10:10:23 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/06 16:22:02 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 16:44:27 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
         char timeChar[6];
         std::strftime(timeChar, sizeof(timeChar),"%H:%M", std::localtime(&nowTime));
         std::string timestr = "" + std::string(timeChar) + "\n";
-        std::cout << timestr;
+        // std::cout << timestr;
         std::string msg = ":BOT PRIVMSG " + ClientsMap[_pfds[i].fd].getNickname() + " :Current Time is: " + timestr;
         send(_pfds[i].fd, msg.c_str(), msg.length(), 0);
     }
@@ -41,7 +41,7 @@ void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
 					man += tr + "*     +o: Give/take channel operator privilege                                     *\r\n";
 					man += tr + "*     +l: Set/remove the user limit to channel                                     *\r\n";
 					man += tr + "************************************************************************************\r\n";
-        std::cout << man;
+        // std::cout << man;
         send(_pfds[i].fd, man.c_str(), man.length(), 0);
     }
     else

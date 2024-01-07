@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/07 10:29:12 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 10:55:49 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 16:44:17 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	Server::authCommand(std::string command, std::string params, int i, int clients_numbers) {
 	if (command == "PASS" || command == "PASS\n") {
 		std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": You are already registered with a password\r\n";
-		std::cout << "response: " << response << std::endl;
+		// std::cout << "response: " << response << std::endl;
 		send(_pfds[i].fd, response.c_str(), response.length(), 0);
 	} else if (command == "PRIVMSG") {
 		handlePrivMsg(params, i,channelsV);
@@ -39,7 +39,7 @@ void	Server::authCommand(std::string command, std::string params, int i, int cli
 		welcomeMessage(i);
 	} else {
 		std::string response = "421 " + ClientsMap[_pfds[i].fd].getNickname() + " :Unknown command: " + command + "\r\n";
-		std::cout << "response: " << response << std::endl;
+		// std::cout << "response: " << response << std::endl;
 		send(_pfds[i].fd, response.c_str(), response.length(), 0);
 	}
 }
@@ -52,6 +52,6 @@ void  Server::nonAuthCommand(int i) {
 		response += "ERROR you need to set a username !\n";
 	if (ClientsMap[_pfds[i].fd].getCorrectPassWord() == false)
 		response += "ERROR you need to enter the server password !\r\n";
-	std::cout << "response: " << response << std::endl;
+	// std::cout << "response: " << response << std::endl;
 	send(_pfds[i].fd, response.c_str(), response.length(), 0);
 }

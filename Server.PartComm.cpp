@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/26 11:54:49 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 11:54:02 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 16:28:39 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,20 +27,20 @@ void Server::handlePartCommand(std::string params, int i, std::map<std::string, 
 		if (it->second.haveClient(_pfds[i].fd) == false)
 		{
 			std::string resp = "442 " + ClientsMap[_pfds[i].fd].getNickname() + " :" + channel + " You're not on that channel\r\n";
-			std::cout << "response: " << resp;
+			// std::cout << "response: " << resp;
 			if (send(_pfds[i].fd, resp.c_str(), resp.length(), 0) == -1)
 				throw sendException();
 		} else {
 			it->second.removeClient(_pfds[i].fd);
 			std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PART " + channel + " :" + msg + "\r\n";
-			std::cout << "response: " << resp << std::endl;
+			// std::cout << "response: " << resp << std::endl;
 			std::vector<int> clientFds = it->second.clientsFd;
 			std::vector<int>::iterator it1 = clientFds.begin();
 			while (it1 != clientFds.end())
 			{
 				std::map<int, Client>::iterator itt = ClientsMap.find(*it1);
 				if (itt->second.getIsAutonticated() == true && itt->second.getNickname() != ClientsMap[_pfds[i].fd].getNickname()) {
-					std::cout << "resp: " << ClientsMap[_pfds[i].fd].getNickname() << " m: " << msg << " c: " << channel << std::endl;
+					// std::cout << "resp: " << ClientsMap[_pfds[i].fd].getNickname() << " m: " << msg << " c: " << channel << std::endl;
 					if (send(*it1, resp.c_str(), resp.length(), 0) == -1)
 						throw sendException();
 				}
@@ -49,7 +49,7 @@ void Server::handlePartCommand(std::string params, int i, std::map<std::string, 
 		}
 	} else {
 		std::string resp = "403 " + ClientsMap[_pfds[i].fd].getNickname() + " :" + channel +" No such channel\r\n";
-		std::cout << "response: " << resp;
+		// std::cout << "response: " << resp;
 		if (send(_pfds[i].fd, resp.c_str(), resp.length(), 0) == -1)
 			throw sendException();
 	}

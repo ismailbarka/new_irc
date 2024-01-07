@@ -20,6 +20,10 @@ FLAGS = -Wall -Wextra -Werror -std=c++98 -g3 -fsanitize=address
 TOTAL_FILES := $(words $(SRC))
 PROGRESS = 0
 
+# Count the number of source files for progress indication
+TOTAL_FILES := $(words $(SRC))
+PROGRESS = 0
+
 all: $(NAME)
 
 $(NAME): $(OBJ)
