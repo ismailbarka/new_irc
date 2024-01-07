@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tahadev <tahadev@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 14:32:20 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 22:53:55 by tahadev          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@
 #include <arpa/inet.h>
 #include <algorithm>
 #include <ctime>
+#include <string.h>
 #include "time.h"
 
 # define GREEN "\033[32m"
@@ -133,6 +134,7 @@ public:
 	void authCommand(std::string command, std::string params, int i, int clients_numbers);
 	void nonAuthCommand(int i);
 	void welcomeNewClient(int & clients_numbers);
+	void fetchDataFromAPI();
 	~Server();
 	int nameTofd(std::string nickName)
 	{
