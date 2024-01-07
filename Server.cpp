@@ -122,6 +122,7 @@ void Server::startServer()
 	char hostname[256];
 	while (1)
 	{
+		std::cout << "test\n";
 		char client_ip[INET_ADDRSTRLEN];
 		int pollResult = poll(_pfds, clients_numbers, -1);
 		if (pollResult == -1) {

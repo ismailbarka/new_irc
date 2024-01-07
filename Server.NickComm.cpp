@@ -12,6 +12,17 @@
 
 #include "Server.hpp"
 
+
+std::string ft_toUpper(std::string str)
+{
+	std::string toReturn(str);
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		toReturn[i] = toupper(str[i]);
+	}
+	return toReturn;
+}
+
 void Server::handleNickCommand(std::string params, int i)
 {
 	params = trimString(params);
@@ -33,7 +44,7 @@ void Server::handleNickCommand(std::string params, int i)
 	bool check = true;
 	for (std::map<int, Client>::iterator it = ClientsMap.begin(); it != ClientsMap.end(); it++)
 	{
-		if (it->second.getNickname() == nickName)
+		if (ft_toUpper(it->second.getNickname()) == ft_toUpper(nickName))
 		{
 			check = false;
 			std::string resp = "433 * nickName already used\r\n";
