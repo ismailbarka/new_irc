@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 12:49:26 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 14:58:44 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,57 @@ void Server::setPollfd(struct pollfd _pfd, int index)
 	_pfds[index] = _pfd;
 }
 
+void Server::welcomeNewClient(int & clients_numbers)
+{
+	char hostname[256];
+	char client_ip[INET_ADDRSTRLEN];
+
+	std::cout << "new client connected\n";
+	struct sockaddr_in client_addr;
+	socklen_t client_addr_size = sizeof(client_addr);
+	int clientSocket = accept(serverSocket, (struct sockaddr *)&client_addr, &client_addr_size);
+	if (clientSocket < 0)
+		throw acceptException();
+	int nFl = fcntl(clientSocket, F_SETFL, O_NONBLOCK); // set socket to non-blocking mode means that recv will not block if there is no data to receive and will return -1 with errno set to EAGAIN or EWOULDBLOCK instead of blocking the execution of the program until data is received or an error occurs (the default behavior)
+	if (nFl < 0) {
+		std::cout << "failed to set socket to non-blocking mode\n";
+		throw fcntlException();
+	} else {
+		std::cout << "socket on non-blocking mode\n";
+	}
+	struct pollfd client;
+	client.fd = clientSocket;
+	client.events = POLLIN | POLLHUP;
+	client.revents = 0;
+	inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN); // ?
+	std::cout << "client ip: " << client_ip << std::endl;
+	//HOSTNAME
+	if (gethostname(hostname, sizeof(hostname)) == 0) {
+		std::cout << "Hostname: " << hostname << std::endl;
+	} else {
+		std::cerr << "Error getting hostname" << std::endl;
+	}
+	//HOSTNAME
+	setPollfd(client, clients_numbers); // set pollfd for new client in pollfd array at index clients_numbers (clients_numbers is the number of clients connected to server)
+	Client newClient(client);
+	newClient.setClientIp(client_ip);
+	newClient.setClientHost(hostname);
+	ClientsMap.insert(std::pair<int, Client>(clientSocket, newClient));
+	clients_numbers++;
+	// std::string response = "251 * MG Welcome to our IRC server, please enter nickname, username and password\n";
+	//mini_irc ascii art
+	std::string art  = "002 * :███╗   ███╗██╗███╗   ██╗██╗        ██╗██████╗  ██████╗ \r\n";
+				art += "002 * :████╗ ████║██║████╗  ██║██║        ██║██╔══██╗██╔════╝ \r\n";
+				art += "002 * :██╔████╔██║██║██╔██╗ ██║██║███████╗██║██████╔╝██║      \r\n";
+				art += "002 * :██║╚██╔╝██║██║██║╚██╗██║██║╚══════╝██║██╔══██╗██║      \r\n";
+				art += "002 * :██║ ╚═╝ ██║██║██║ ╚████║██║        ██║██║  ██║╚██████╗ \r\n";
+				art += "002 * :╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝        ╚═╝╚═╝  ╚═╝ ╚═════╝ \r\n";
+				art += "002 * :[~[ Welcome to the FT_IRC server! Enjoy your chat. ]~] \r\n";
+	std::cout << art << std::endl;
+	send(clientSocket, art.c_str(), art.length(), 0);
+	//check if is autonticated
+}
+
 void Server::startServer()
 {
 	std::string line;
@@ -120,67 +171,23 @@ void Server::startServer()
 	listenSocket();
 	setPollfd();
 	int clients_numbers = 1;
-	char hostname[256];
 	while (1)
 	{
 		std::cout << RED << "=======> HELLO FROM SERVER <=======" << RESET << std::endl;
-		char client_ip[INET_ADDRSTRLEN];
-		int pollResult = poll(_pfds, clients_numbers, -1);
+		int pollResult = poll(_pfds, clients_numbers, -1); // poll will block the execution of the program until there is an event to handle (poll will return -1 if an error occured) (poll will return 0 if timeout occured) (poll will return the number of file descriptors ready for the requested operation if there is an event to handle)
+		std::cout << GREEN << "====> pollResult: " << pollResult << RESET << std::endl;
 		if (pollResult == -1) {
 			throw pollException();
 		}
-		if (_pfds[0].revents & POLLIN) { // new client connected to server
-			std::cout << "new client connected\n";
-			struct sockaddr_in client_addr;
-			socklen_t client_addr_size = sizeof(client_addr);
-			int clientSocket = accept(serverSocket, (struct sockaddr *)&client_addr, &client_addr_size);
-			if (clientSocket < 0)
-				throw acceptException();
-			int nFl = fcntl(clientSocket, F_SETFL, O_NONBLOCK);
-			if (nFl < 0) {
-				std::cout << "failed to set socket to non-blocking mode\n";
-				throw fcntlException();
-			} else {
-				std::cout << "socket on non-blocking mode\n";
-			}
-			struct pollfd client;
-			client.fd = clientSocket;
-			client.events = POLLIN | POLLHUP;
-			client.revents = 0;
-			inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN); // ?
-			std::cout << "client ip: " << client_ip << std::endl;
-			//HOSTNAME
-			if (gethostname(hostname, sizeof(hostname)) == 0) {
-				std::cout << "Hostname: " << hostname << std::endl;
-			} else {
-				std::cerr << "Error getting hostname" << std::endl;
-			}
-			//HOSTNAME
-			setPollfd(client, clients_numbers);
-			Client newClient(client);
-			newClient.setClientIp(client_ip);
-			newClient.setClientHost(hostname);
-			ClientsMap.insert(std::pair<int, Client>(clientSocket, newClient));
-			clients_numbers++;
-			// std::string response = "251 * MG Welcome to our IRC server, please enter nickname, username and password\n";
-			//mini_irc ascii art
-			std::string art  = "002 * :███╗   ███╗██╗███╗   ██╗██╗        ██╗██████╗  ██████╗ \r\n";
-						art += "002 * :████╗ ████║██║████╗  ██║██║        ██║██╔══██╗██╔════╝ \r\n";
-						art += "002 * :██╔████╔██║██║██╔██╗ ██║██║███████╗██║██████╔╝██║      \r\n";
-						art += "002 * :██║╚██╔╝██║██║██║╚██╗██║██║╚══════╝██║██╔══██╗██║      \r\n";
-						art += "002 * :██║ ╚═╝ ██║██║██║ ╚████║██║        ██║██║  ██║╚██████╗ \r\n";
-						art += "002 * :╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝        ╚═╝╚═╝  ╚═╝ ╚═════╝ \r\n";
-						art += "002 * :[~[ Welcome to the FT_IRC server! Enjoy your chat. ]~] \r\n";
-			std::cout << art << std::endl;
-			send(clientSocket, art.c_str(), art.length(), 0);
-			//check if is autonticated
+		if (_pfds[0].revents & POLLIN) { // new client connected to server socket (POLLIN means that there is data to receive)
+			welcomeNewClient(clients_numbers);
 		}
 		//Grap diconnected clients
 		for (int i = 1; i < clients_numbers; i++) {
 			if (_pfds[i].revents & POLLIN) {
 				char buffer[1024];
 				memset(buffer, 0, sizeof(buffer));
-				int readed = recv(_pfds[i].fd, buffer, 1024, 0);
+				int readed = recv(_pfds[i].fd, buffer, 1024, 0); // read data from client socket and store it in buffer variable (recv will return -1 if an error occured) (recv will return 0 if client closed the connection) (recv will return the number of bytes received if there is data to receive)
 				if (readed < 0) {
 					perror("recv Error");
 					continue;
@@ -191,14 +198,14 @@ void Server::startServer()
 					buffer[readed] = '\0';
 					std::cout << GREEN << "\n==> received: [" << buffer << "]" << RESET << std::endl;
 					line += buffer;
-					size_t checknewline = line.find('\n');
-					if (checknewline != std::string::npos)
+					std::cout << BLUE << "1 |=======> line: [" << line << "]" << RESET << std::endl;
+					if (line.find('\n') != std::string::npos)
 					{
-						std::stringstream ss(buffer);
+						std::stringstream ss(line);
 						while (std::getline(ss, line, '\n'))
 						{
+							std::cout << BLUE << "2 |=======> line: [" << line << "]" << RESET << std::endl;
 							line = line.substr(0, line.find("\r"));
-							std::cout << BLUE << "|=======> line: [" << line << "]" << RESET << std::endl;
 							size_t pos = line.find(" ");
 							std::string command = line.substr(0, pos);
 							if (command.empty())
@@ -206,7 +213,7 @@ void Server::startServer()
 							std::string params;
 							if (pos != std::string::npos)
 								params = line.substr(pos + 1);
-							std::cout << RED << "params: [" << params << "]" << RESET << std::endl;
+							params = trimString(params);
 							std::cout << "command: [" << command << "]" << std::endl;
 							std::cout << "params: [" << params << "]" << std::endl;
 							if ((command == "PASS" || command == "PASS\n") && !ClientsMap[_pfds[i].fd].getIsAutonticated()) {
@@ -222,7 +229,10 @@ void Server::startServer()
 							} else {
 								nonAuthCommand(i);
 							}
+							line.clear();
 						}
+					} else {
+						std::cout << RED << "line=> " << buffer << RESET << std::endl;
 					}
 				}
 			}

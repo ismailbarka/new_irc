@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 10:56:03 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 14:32:20 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,7 @@ public:
 	void joinChannel(std::string key, int i, std::map<std::string, Channels> &channelsV, std::string value);
 	void authCommand(std::string command, std::string params, int i, int clients_numbers);
 	void nonAuthCommand(int i);
+	void welcomeNewClient(int & clients_numbers);
 	~Server();
 	int nameTofd(std::string nickName)
 	{

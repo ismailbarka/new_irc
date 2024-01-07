@@ -6,14 +6,13 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:37:01 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/06 16:19:29 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 14:15:04 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
 void Server::handleUserCommand(std::string params, int i) {
-	params = trimString(params);
 	if (ClientsMap.find(_pfds[i].fd) != ClientsMap.end() && ClientsMap[_pfds[i].fd].getIsAutonticated()) {
 		std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": You are already registered with a username\r\n";
 		std::cout << "response: " << response << std::endl;
