@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:45:29 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 16:10:01 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 16:45:54 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void Server::handleListCommand(int i, int clients_numbers)
 	{
 		std::string reponse = "322 Channel " + it->first + " " + std::to_string(it->second.clientsFd.size()) + " " + it->second.topic + "\r\n";
 		//membres count
-		std::cout << reponse << std::endl;
+		// std::cout << reponse << std::endl;
 		send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
 		it++;
 	}

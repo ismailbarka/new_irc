@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 16:22:14 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 17:01:09 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ Server::Server(char **av)
 	int tmp = 1;
 	int nRet = setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &tmp, sizeof(int));
 	if (!nRet) {
-		std::cout << "nRet success\n";
+		// std::cout << "nRet success\n";
 	} else {
 		std::cout << "nRet failed\n";
 		throw setsockoptException();
@@ -77,7 +77,7 @@ void Server::welcomeMessage(int i)
 		response += "375 " + ClientsMap[_pfds[i].fd].getNickname() + " :- This server was created in 2023-12-15\r\n";
 		response += "375 " + ClientsMap[_pfds[i].fd].getNickname() + " :- There are " + std::to_string(ClientsMap.size()) + " user(s) and " + std::to_string(channelsV.size()) + " channel(s) on this server.\r\n";
 		response += "376 " + ClientsMap[_pfds[i].fd].getNickname() + " :End of /MOTD.\r\n";
-		std::cout << "response: " << response;
+		// std::cout << "response: " << response;
 		send(_pfds[i].fd, response.c_str(), response.length(), 0);
 	}
 }
@@ -118,7 +118,7 @@ void Server::welcomeNewClient(int & clients_numbers)
 	char hostname[256];
 	char client_ip[INET_ADDRSTRLEN];
 
-	std::cout << "new client connected\n";
+	std::cout << YELLOW << "New client connected" RESET << std::endl;
 	struct sockaddr_in client_addr;
 	socklen_t client_addr_size = sizeof(client_addr);
 	int clientSocket = accept(serverSocket, (struct sockaddr *)&client_addr, &client_addr_size);
@@ -128,18 +128,16 @@ void Server::welcomeNewClient(int & clients_numbers)
 	if (nFl < 0) {
 		std::cout << "failed to set socket to non-blocking mode\n";
 		throw fcntlException();
-	} else {
-		std::cout << "socket on non-blocking mode\n";
 	}
 	struct pollfd client;
 	client.fd = clientSocket;
 	client.events = POLLIN | POLLHUP;
 	client.revents = 0;
-	inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN); // ?
-	std::cout << "client ip: " << client_ip << std::endl;
+	inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN);
+	std::cout << "Client IP: " << BLUE << client_ip << RESET << std::endl;
 	//HOSTNAME
 	if (gethostname(hostname, sizeof(hostname)) == 0) {
-		std::cout << "Hostname: " << hostname << std::endl;
+		std::cout << "Hostname: " << BLUE << hostname << RESET << std::endl;
 	} else {
 		std::cerr << "Error getting hostname" << std::endl;
 	}
@@ -152,14 +150,14 @@ void Server::welcomeNewClient(int & clients_numbers)
 	clients_numbers++;
 	// std::string response = "251 * MG Welcome to our IRC server, please enter nickname, username and password\n";
 	//mini_irc ascii art
-	std::string art  = "002 * :███╗   ███╗██╗███╗   ██╗██╗        ██╗██████╗  ██████╗ \r\n";
-				art += "002 * :████╗ ████║██║████╗  ██║██║        ██║██╔══██╗██╔════╝ \r\n";
-				art += "002 * :██╔████╔██║██║██╔██╗ ██║██║███████╗██║██████╔╝██║      \r\n";
-				art += "002 * :██║╚██╔╝██║██║██║╚██╗██║██║╚══════╝██║██╔══██╗██║      \r\n";
-				art += "002 * :██║ ╚═╝ ██║██║██║ ╚████║██║        ██║██║  ██║╚██████╗ \r\n";
-				art += "002 * :╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝        ╚═╝╚═╝  ╚═╝ ╚═════╝ \r\n";
-				art += "002 * :[~[ Welcome to the FT_IRC server! Enjoy your chat. ]~] \r\n";
-	std::cout << art << std::endl;
+	std::string art  = "NOTICE * :███╗   ███╗██╗███╗   ██╗██╗        ██╗██████╗  ██████╗ \r\n";
+				art += "NOTICE * :████╗ ████║██║████╗  ██║██║        ██║██╔══██╗██╔════╝ \r\n";
+				art += "NOTICE * :██╔████╔██║██║██╔██╗ ██║██║███████╗██║██████╔╝██║      \r\n";
+				art += "NOTICE * :██║╚██╔╝██║██║██║╚██╗██║██║╚══════╝██║██╔══██╗██║      \r\n";
+				art += "NOTICE * :██║ ╚═╝ ██║██║██║ ╚████║██║        ██║██║  ██║╚██████╗ \r\n";
+				art += "NOTICE * :╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝        ╚═╝╚═╝  ╚═╝ ╚═════╝ \r\n";
+				art += "NOTICE * :[~[ Welcome to the FT_IRC server! Enjoy your chat. ]~] \r\n";
+	std::cout << GREEN << art << RESET << std::endl;
 	send(clientSocket, art.c_str(), art.length(), 0);
 	//check if is autonticated
 }
@@ -173,10 +171,10 @@ void Server::startServer()
 	int clients_numbers = 1;
 	while (1)
 	{
-		std::cout << RED << "=======> HELLO FROM SERVER <=======" << RESET << std::endl;
+		// std::cout << RED << "=======> HELLO FROM SERVER <=======" << RESET << std::endl;
 		int pollResult = poll(_pfds, clients_numbers, -1); // poll will block the execution of the program until there is an event to handle (poll will return -1 if an error occured) (poll will return 0 if timeout occured) (poll will return the number of file descriptors ready for the requested operation if there is an event to handle)
 		//-1 passed to poll means that poll will block the execution of the program until there is an event to handle
-		std::cout << GREEN << "====> pollResult: " << pollResult << RESET << std::endl;
+		// std::cout << GREEN << "====> pollResult: " << pollResult << RESET << std::endl;
 		if (pollResult == -1) {
 			throw pollException();
 		}
@@ -197,15 +195,15 @@ void Server::startServer()
 						handleQuitCommand(i, clients_numbers, "Client Quit");
 				} else if (readed > 0) {
 					buffer[readed] = '\0';
-					std::cout << GREEN << "\n==> received: [" << buffer << "]" << RESET << std::endl;
+					// std::cout << GREEN << "\n==> received: [" << buffer << "]" << RESET << std::endl;
 					line += buffer;
-					std::cout << BLUE << "1 |=======> line: [" << line << "]" << RESET << std::endl;
+					// std::cout << BLUE << "1 |=======> line: [" << line << "]" << RESET << std::endl;
 					if (line.find('\n') != std::string::npos)
 					{
 						std::stringstream ss(line);
 						while (std::getline(ss, line, '\n'))
 						{
-							std::cout << BLUE << "2 |=======> line: [" << line << "]" << RESET << std::endl;
+							// std::cout << BLUE << "2 |=======> line: [" << line << "]" << RESET << std::endl;
 							line = line.substr(0, line.find("\r"));
 							size_t pos = line.find(" ");
 							std::string command = line.substr(0, pos);
@@ -215,8 +213,8 @@ void Server::startServer()
 							if (pos != std::string::npos)
 								params = line.substr(pos + 1);
 							params = trimString(params);
-							std::cout << "command: [" << command << "]" << std::endl;
-							std::cout << "params: [" << params << "]" << std::endl;
+							// std::cout << "command: [" << command << "]" << std::endl;
+							// std::cout << "params: [" << params << "]" << std::endl;
 							if ((command == "PASS" || command == "PASS\n") && !ClientsMap[_pfds[i].fd].getIsAutonticated()) {
 								handlePassCommand(params, i);
 							} else if (command == "NICK") {

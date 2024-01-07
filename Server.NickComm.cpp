@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:34:52 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 16:22:59 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 16:54:53 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,12 @@ void Server::handleNickCommand(std::string params, int i)
 	}
 	if (ClientsMap.find(_pfds[i].fd) != ClientsMap.end() && ClientsMap[_pfds[i].fd].getIsAutonticated()) {
 		std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": You are already registered with a nickname\r\n";
-		std::cout << "response: " << response << std::endl;
+		// std::cout << "response: " << response << std::endl;
 		send(_pfds[i].fd, response.c_str(), response.length(), 0);
 		return;
 	}
 	std::string nickName = params.substr(0, params.find("\r"));
-	std::cout << "nickName: " << nickName << std::endl;
+	// std::cout << "nickName: " << nickName << std::endl;
 	bool check = true;
 	for (std::map<int, Client>::iterator it = ClientsMap.begin(); it != ClientsMap.end(); it++)
 	{
@@ -46,7 +46,7 @@ void Server::handleNickCommand(std::string params, int i)
 		{
 			check = false;
 			std::string resp = "433 * nickName already used\r\n";
-			std::cout << resp;
+			// std::cout << resp;
 			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 		}
 	}
@@ -54,7 +54,7 @@ void Server::handleNickCommand(std::string params, int i)
 	{
 		ClientsMap[_pfds[i].fd].setNickname(nickName);
 		ClientsMap[_pfds[i].fd].setIsAutonticated();
-		std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
+		// std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
 		welcomeMessage(i);
 	}
 }

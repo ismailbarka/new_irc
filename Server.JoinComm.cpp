@@ -41,7 +41,7 @@ void Server:: firstJoin(std::string key, std::string value, bool pass, int i, st
 	channel.operators.push_back(ClientsMap[_pfds[i].fd]);
 	channelsV.insert(std::pair<std::string, Channels>(key, channel));
 	std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" + ClientsMap[_pfds[i].fd].ipAddress + " JOIN " + key + "\n";
-	std::cout << "response: " << resp;
+	// std::cout << "response: " << resp;
 	resp += ":" + std::string(ClientsMap[_pfds[i].fd].ipAddress) + " MODE " + key + " +o " + ClientsMap[_pfds[i].fd].getNickname() + "\r\n";
 	std::vector<int>::iterator it = channel.clientsFd.begin();
 	while (it != channel.clientsFd.end())
@@ -66,7 +66,7 @@ void Server::joinChannel(std::string key, int i, std::map<std::string, Channels>
 	{
 		//tell him that he can't join this channel because it's invite only
 		std::string resp = "473 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :Cannot join channel (+i)\r\n";
-		std::cout << "response: " << resp;
+		// std::cout << "response: " << resp;
 		send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 		return;
 	}
@@ -74,7 +74,7 @@ void Server::joinChannel(std::string key, int i, std::map<std::string, Channels>
 	{
 		//tell him that he can't join this channel because it's invite only
 		std::string resp = "471 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :Cannot join channel (+l)\r\n";
-		std::cout << "response: " << resp;
+		// std::cout << "response: " << resp;
 		send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 		return;
 	}
@@ -83,7 +83,7 @@ void Server::joinChannel(std::string key, int i, std::map<std::string, Channels>
 	{
 		//tell him that he can't join this channel because it's invite only
 		std::string resp = "475 " + ClientsMap[_pfds[i].fd].getNickname() + " " + key + " :Cannot join channel (incorrect password)\r\n";
-		std::cout << "response: " << resp;
+		// std::cout << "response: " << resp;
 		send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 		return;
 	}
@@ -129,8 +129,8 @@ void Server::handleJoinCommand(std::string params, int i, std::map<std::string, 
 		std::getline(iss, values);
 		std::stringstream issKey(keys);
 		std::stringstream issVlaue(values);
-		std::cout << "keys = " << keys << std::endl;
-		std::cout << "values = " << values << std::endl;
+		// std::cout << "keys = " << keys << std::endl;
+		// std::cout << "values = " << values << std::endl;
 		if (valideParams(keys, values) == false)
 		{
 			std::cout << "error arguments\n";
@@ -158,7 +158,7 @@ void Server::handleJoinCommand(std::string params, int i, std::map<std::string, 
 						if (value != it->second.password) {
 							std::string resp = "475 " + ClientsMap[_pfds[i].fd].getNickname() + " Incorrect password " + "\r\n";
 							send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
-							std::cout << "Incorrect password\n";
+							// std::cout << "Incorrect password\n";
 						} else {
 							joinChannel(key, i, channelsV, value);
 						}
