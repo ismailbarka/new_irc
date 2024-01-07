@@ -6,12 +6,11 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:34:52 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/01 14:45:54 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 16:22:59 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
-
 
 std::string ft_toUpper(std::string str)
 {
@@ -25,7 +24,6 @@ std::string ft_toUpper(std::string str)
 
 void Server::handleNickCommand(std::string params, int i)
 {
-	params = trimString(params);
 	if (params.empty())
 	{
 		std::cout << "Invalid NickName" << std::endl;

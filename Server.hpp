@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/04 11:15:33 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 14:32:20 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,9 +126,13 @@ public:
 	void handleKickCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void handleTopicCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
 	void handlePartCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
+	void handlePassCommand(std::string params, int i);
 	void startServer();
 	void firstJoin(std::string key, std::string value, bool pass, int i, std::map<std::string, Channels> &channelsV);
 	void joinChannel(std::string key, int i, std::map<std::string, Channels> &channelsV, std::string value);
+	void authCommand(std::string command, std::string params, int i, int clients_numbers);
+	void nonAuthCommand(int i);
+	void welcomeNewClient(int & clients_numbers);
 	~Server();
 	int nameTofd(std::string nickName)
 	{

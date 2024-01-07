@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/26 11:54:49 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/04 10:32:40 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/07 11:54:02 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,7 @@ void Server::handlePartCommand(std::string params, int i, std::map<std::string, 
 	if (it != channelsV.end())
 	{
 		//check if the client is not in the channel
-		std::vector<int>::iterator it1 = it->second.clientsFd.begin();
-		while (it1 != it->second.clientsFd.end() && *it1 != _pfds[i].fd)
-			it1++;
-		if (it1 == it->second.clientsFd.end())
+		if (it->second.haveClient(_pfds[i].fd) == false)
 		{
 			std::string resp = "442 " + ClientsMap[_pfds[i].fd].getNickname() + " :" + channel + " You're not on that channel\r\n";
 			std::cout << "response: " << resp;
