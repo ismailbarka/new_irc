@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tahadev <tahadev@student.42.fr>            +#+  +:+       +#+        */
+/*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 22:53:55 by tahadev          ###   ########.fr       */
+/*   Updated: 2024/01/08 10:02:05 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,6 @@ public:
 	void authCommand(std::string command, std::string params, int i, int clients_numbers);
 	void nonAuthCommand(int i);
 	void welcomeNewClient(int & clients_numbers);
-	void fetchDataFromAPI();
 	~Server();
 	int nameTofd(std::string nickName)
 	{
