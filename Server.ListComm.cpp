@@ -6,16 +6,15 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:45:29 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 16:45:54 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/08 12:13:56 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-void Server::handleListCommand(int i, int clients_numbers)
+void Server::handleListCommand(int i)
 {
 	//list all channels
-	(void)clients_numbers;
 	std::string reponse = "321 Channel :Users  Name\r\n";
 	send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
 	std::map<std::string, Channels>::iterator it = channelsV.begin();

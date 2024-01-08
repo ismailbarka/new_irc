@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 11:02:19 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/03 09:53:29 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/08 12:17:58 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,11 @@ std::string Client::getNickname()
 std::string Client::getUserName()
 {
 	return userName;
+}
+
+std::string Client::getRealName()
+{
+	return realName;
 }
 
 void Client::setIsAutonticated()

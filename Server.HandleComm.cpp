@@ -6,13 +6,13 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/07 10:29:12 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 16:44:17 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/08 12:25:13 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-void	Server::authCommand(std::string command, std::string params, int i, int clients_numbers) {
+void	Server::authCommand(std::string command, std::string params, int i) {
 	if (command == "PASS" || command == "PASS\n") {
 		std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": You are already registered with a password\r\n";
 		// std::cout << "response: " << response << std::endl;
@@ -20,7 +20,7 @@ void	Server::authCommand(std::string command, std::string params, int i, int cli
 	} else if (command == "PRIVMSG") {
 		handlePrivMsg(params, i,channelsV);
 	} else if (command == "LIST" || command == "LIST\n") {
-		handleListCommand(i, clients_numbers);
+		handleListCommand(i);
 	} else if (command == "JOIN" || command == "JOIN\n") {
 		handleJoinCommand(params, i, channelsV, _pfds);
 	} else if (command == "INVITE" || command == "INVITE\n") {
@@ -36,7 +36,9 @@ void	Server::authCommand(std::string command, std::string params, int i, int cli
 	} else if (command == "PART" || command == "PART\n") {
 		handlePartCommand(params, i, channelsV, _pfds);
 	} else if (command == "MOTD") {
-		welcomeMessage(i);
+		welcomeMessage(i); }
+	else if (command == "HELP" || command == "HELP\n") {
+		handleBotCommand("HELP", i, _pfds);
 	} else {
 		std::string response = "421 " + ClientsMap[_pfds[i].fd].getNickname() + " :Unknown command: " + command + "\r\n";
 		// std::cout << "response: " << response << std::endl;

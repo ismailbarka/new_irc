@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:05:37 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/08 10:02:05 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/08 12:14:50 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ public:
 	void handleBotCommand(std::string params, int i, struct pollfd _pfds[]);
 	void handleUserCommand(std::string params, int i);
 	void handleJoinCommand(std::string params, int i, std::map<std::string, Channels> &channelsV,struct pollfd _pfds[]);
-	void handleListCommand(int i, int clients_numbers);
+	void handleListCommand(int i);
 	void handleQuitCommand(int i, int & clients_numbers, std::string params);
 	void handlePrivMsg(std::string params, int i, std::map<std::string,Channels> &channelsV);
 	void handleModeCommand(std::string params,int i,std::map<std::string, Channels> & channelsV);
@@ -131,7 +131,7 @@ public:
 	void startServer();
 	void firstJoin(std::string key, std::string value, bool pass, int i, std::map<std::string, Channels> &channelsV);
 	void joinChannel(std::string key, int i, std::map<std::string, Channels> &channelsV, std::string value);
-	void authCommand(std::string command, std::string params, int i, int clients_numbers);
+	void authCommand(std::string command, std::string params, int i);
 	void nonAuthCommand(int i);
 	void welcomeNewClient(int & clients_numbers);
 	~Server();

@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 11:02:31 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/01 15:49:12 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/08 12:17:48 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ class Client
 		void setRealName(std::string _realName);
 		std::string getNickname();
 		std::string getUserName();
+		std::string getRealName();
 		bool getIsAutonticated();
 		void setClientIp(char* ip);
 		void setIsAutonticated();

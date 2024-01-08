@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/08 11:50:26 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/08 12:15:05 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,8 +193,6 @@ void Server::startServer()
 				} else if (readed == 0) {
 					if (_pfds[i].revents & POLLHUP)
 						handleQuitCommand(i, clients_numbers, "Client Quit");
-						std::cout << RED << "Client disconnected" << RESET << std::endl;
-						line.clear();
 				} else if (readed > 0) {
 					buffer[readed] = '\0';
 					// std::cout << GREEN << "\n==> received: [" << buffer << "]" << RESET << std::endl;
@@ -226,12 +224,14 @@ void Server::startServer()
 							} else if (command == "QUIT" || command == "QUIT\n") {
 								handleQuitCommand(i, clients_numbers, params);
 							} else if (ClientsMap[_pfds[i].fd].getIsAutonticated()) {
-								authCommand(command, params, i, clients_numbers);
+								authCommand(command, params, i);
 							} else {
 								nonAuthCommand(i);
 							}
 							line.clear();
 						}
+					} else {
+						std::cout << RED << "line=> " << buffer << RESET << std::endl;
 					}
 				}
 			}

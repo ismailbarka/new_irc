@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/26 11:54:49 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 16:28:39 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/08 12:40:46 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,15 @@ void Server::handlePartCommand(std::string params, int i, std::map<std::string, 
 				throw sendException();
 		} else {
 			it->second.removeClient(_pfds[i].fd);
+			std::vector<Client>::iterator it4 = it->second.operators.begin();
+			while (it4 != it->second.operators.end())
+			{
+				if (it4->getNickname() == ClientsMap[_pfds[i].fd].getNickname())
+					break;
+				it4++;
+			}
+			if (it4 != it->second.operators.end())
+				it->second.operators.erase(it4);
 			std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + " PART " + channel + " :" + msg + "\r\n";
 			// std::cout << "response: " << resp << std::endl;
 			std::vector<int> clientFds = it->second.clientsFd;
