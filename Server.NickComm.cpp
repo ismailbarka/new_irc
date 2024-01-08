@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:34:52 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 16:54:53 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/08 10:17:44 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@ std::string ft_toUpper(std::string str)
 
 void Server::handleNickCommand(std::string params, int i)
 {
-	if (params.empty())
+	if (params.empty() || params[0] == ':')
 	{
-		std::cout << "Invalid NickName" << std::endl;
-		std::string resp = "431 * Invalid NickName!\r\n";
+		// std::cout << "Invalid NickName" << std::endl;
+		std::string resp = "432 * Invalid NickName!\r\n";
 		send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 		return;
 	}

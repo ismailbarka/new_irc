@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:37:01 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 16:54:40 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/08 10:24:44 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,11 @@ void Server::handleUserCommand(std::string params, int i) {
 	// std::cout << "zero: " << zero << std::endl;
 	// std::cout << "asterisk: " << asterisk << std::endl;
 	// std::cout << "realName: " << realName << std::endl;
-	if (zero != "0" || asterisk != "*" || realName.empty() || userName.empty())
+	if (zero != "0" || asterisk != "*" || realName.empty() || userName.empty() || realName[0] == ':')
 	{
-		std::string response = "ERROR " + ClientsMap[_pfds[i].fd].getNickname() + ": Invalid USER command\r\n";
-		response += "exemple: USER <username> 0 * <realname>\r\n";
+		std::string response = "468 * Invalid USER command\r\n";
+		send(_pfds[i].fd, response.c_str(), response.length(), 0);
+		response = "468 * example: USER <username> 0 * <realname>\r\n";
 		// std::cout << "response: " << response << std::endl;
 		send(_pfds[i].fd, response.c_str(), response.length(), 0);
 		return;
