@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/01 10:10:23 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/08 12:51:37 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/08 13:01:51 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,11 @@ void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
 {
 	std::stringstream ss(params);
 	std::string command;
+	std::string target;
 	ss >> command;
 	if (command == "BOT" || command == "/BOT")
 		ss >> command;
+	ss >> target;
     std::string tr = ":BOT PRIVMSG " + ClientsMap[_pfds[i].fd].getNickname() + " :";
     if (command == "TIME" || command == "TIME\n")
     {
@@ -54,6 +56,7 @@ void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
 					man += tr + "*      /BOT TIME                                                                   *\r\n";
 					man += tr + "*      /BOT LIST                                                                   *\r\n";
 					man += tr + "*      /BOT WHOAMI                                                                 *\r\n";
+					man += tr + "*      /BOT WHOIS + nickName                                                       *\r\n";
 					man += tr + "************************************************************************************\r\n";
         // std::cout << man;
         send(_pfds[i].fd, man.c_str(), man.length(), 0);
@@ -93,6 +96,57 @@ void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
 		msg += "\r\n";
 		send(_pfds[i].fd, msg.c_str(), msg.length(), 0);
 	}
+	else if (command == "WHOIS" || command == "WHOIS\n")
+	{
+		if (target.empty())
+		{
+			std::string msg = tr + "Please enter a nickname\r\n";
+			send(_pfds[i].fd, msg.c_str(), msg.length(), 0);
+			return ;
+		}
+		std::map<int, Client>::iterator it = ClientsMap.begin();
+		while (it != ClientsMap.end())
+		{
+			if (it->second.getNickname() == target)
+			{
+				std::string msg = tr + "Nickname: " + it->second.getNickname() + "\r\n";
+				msg += tr + "Username: " + it->second.getUserName() + "\r\n";
+				msg += tr + "Hostname: " + it->second._client_host + "\r\n";
+				msg += tr + "Realname: " + it->second.getRealName() + "\r\n";
+				msg += tr + "Ip address: " + it->second.ipAddress + "\r\n";
+				msg += tr + "Joined channels: ";
+				std::map<std::string, Channels>::iterator it2 = channelsV.begin();
+				while (it2 != channelsV.end())
+				{
+					if (it2->second.haveClient(it->first))
+					{
+						msg += it2->first + " ";
+					}
+					it2++;
+				}
+				msg += "\r\n";
+				msg += tr + "Operator in: ";
+				it2 = channelsV.begin();
+				while (it2 != channelsV.end())
+				{
+					if (it2->second.isOperator(it->first))
+					{
+						msg += it2->first + " ";
+					}
+					it2++;
+				}
+				msg += "\r\n";
+				send(_pfds[i].fd, msg.c_str(), msg.length(), 0);
+				return ;
+			}
+			it++;
+		}
+		if (it == ClientsMap.end())
+		{
+			std::string msg = tr + "Nickname not found\r\n";
+			send(_pfds[i].fd, msg.c_str(), msg.length(), 0);
+		}
+	}
 	else if (command == "LIST" || command == "LIST\n")
 	{
 		handleListCommand(i);
@@ -105,6 +159,7 @@ void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
         str += tr + " /BOT TIME\r\n";
 		str += tr + " /BOT LIST\r\n";
 		str += tr + " /BOT WHOAMI\r\n";
+		str += tr + " /BOT WHOIS\r\n";
         send(_pfds[i].fd,str.c_str(), str.length(), 0);
     }
 }
