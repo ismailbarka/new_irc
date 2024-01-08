@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:51:50 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/08 13:32:19 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/08 14:43:35 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ Server::Server()
 
 Server::~Server()
 {
+	close(serverSocket);
 	std::cout << "Server destroyed" << std::endl;
 }
 
