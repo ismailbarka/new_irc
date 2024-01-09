@@ -28,7 +28,6 @@ void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
         char timeChar[6];
         std::strftime(timeChar, sizeof(timeChar),"%H:%M", std::localtime(&nowTime));
         std::string timestr = "" + std::string(timeChar) + "\n";
-        // std::cout << timestr;
         std::string msg = ":BOT PRIVMSG " + ClientsMap[_pfds[i].fd].getNickname() + " :Current Time is: " + timestr;
         send(_pfds[i].fd, msg.c_str(), msg.length(), 0);
     }
@@ -58,7 +57,6 @@ void Server::handleBotCommand(std::string params, int i, struct pollfd _pfds[])
 					man += tr + "*      /BOT WHOAMI                                                                 *\r\n";
 					man += tr + "*      /BOT WHOIS + nickName                                                       *\r\n";
 					man += tr + "************************************************************************************\r\n";
-        // std::cout << man;
         send(_pfds[i].fd, man.c_str(), man.length(), 0);
     }
 	else if (command == "LIST" || command == "LIST\n")

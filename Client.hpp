@@ -40,7 +40,7 @@ class Client
 	public:
 		char ipAddress[INET_ADDRSTRLEN];
 		std::string _client_host;
-		// std::string ipAddress;
+
 		void setPollfd(struct pollfd _pFd);
 		void setNickname(std::string _nickName);
 		void setuserName(std::string _userName);
@@ -58,13 +58,6 @@ class Client
 		Client(struct pollfd client);
 		std::string getClientHost() const ;
 		void setClientHost(std::string host);
-		// void fillCommandList()
-		// {
-		// 	commandList.push_back("USER");
-		// 	commandList.push_back("NICK");
-		// 	commandList.push_back("LIST");
-		// 	commandList.push_back("QUIT");
-		// }
 		~Client();
 };
 

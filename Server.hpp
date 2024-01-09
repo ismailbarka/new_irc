@@ -55,14 +55,12 @@ public:
 	struct pollfd _pfds[1024];
 	std::string nickName;
 	std::string userName;
-	// bool isAutonticated;
 	std::vector<std::string> commandList;
 	struct sockaddr_in server_addr;
 	std::map<std::string,Channels> channelsV;
 	std::map<int, Client> ClientsMap;
 	std::string _password;
 	Server();
-	//create own exception
 	class ServerException : public std::exception {
 		public:
 			virtual const char* what() const throw() { return ("Server Exception"); }

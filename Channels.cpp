@@ -38,15 +38,7 @@ void Channels::addClient(int _clientFd)
 		clientsFd.push_back(_clientFd);
 }
 
-// std::vector<int> Channels::getClientFd()
-// {
-// 	return clientsFd;
-// }
 
-// std::vector<int>  & Channels::getClientsFd()
-// {
-// 	return clientsFd;
-// }
 
 void Channels::setMode(std::string _mode)
 {

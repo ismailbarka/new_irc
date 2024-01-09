@@ -25,8 +25,7 @@ class Channels
 		bool removeClient(int _clientFd);
 		bool haveClient(int _clientFd);
 		bool isOperator(int _clientFd);
-		// std::vector<int> getClientFd();
-		// std::vector<int>  & getClientsFd();
+
 };
 
 #endif
