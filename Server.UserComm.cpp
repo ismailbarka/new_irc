@@ -30,16 +30,16 @@ void Server::handleUserCommand(std::string params, int i) {
 		realName += rn + " ";
 	if (realName.empty())
 		realName = ClientsMap[_pfds[i].fd].getNickname();
-	// std::cout << "userName: " << userName << std::endl;
-	// std::cout << "zero: " << zero << std::endl;
-	// std::cout << "asterisk: " << asterisk << std::endl;
-	// std::cout << "realName: " << realName << std::endl;
+	
+	
+	
+	
 	if (zero != "0" || asterisk != "*" || realName.empty() || userName.empty())
 	{
 		std::string response = "468 * Invalid USER command\r\n";
 		send(_pfds[i].fd, response.c_str(), response.length(), 0);
 		response = "468 * example: USER <username> 0 * <realname>\r\n";
-		// std::cout << "response: " << response << std::endl;
+		
 		send(_pfds[i].fd, response.c_str(), response.length(), 0);
 		return;
 	}
@@ -48,6 +48,6 @@ void Server::handleUserCommand(std::string params, int i) {
 	if (realName[0] == ':')
 		realName.erase(0, 1);
 	ClientsMap[_pfds[i].fd].setRealName(realName);
-	// std::cout << "isAutonticated: " << std::boolalpha << ClientsMap[_pfds[i].fd].getIsAutonticated() << std::endl;
+	
 	welcomeMessage(i);
 }

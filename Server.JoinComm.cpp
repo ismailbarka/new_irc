@@ -41,7 +41,6 @@ void Server:: firstJoin(std::string key, std::string value, bool pass, int i, st
 	channel.operators.push_back(ClientsMap[_pfds[i].fd]);
 	channelsV.insert(std::pair<std::string, Channels>(key, channel));
 	std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" + ClientsMap[_pfds[i].fd].ipAddress + " JOIN " + key + "\n";
-	// std::cout << "response: " << resp;
 	resp += ":" + std::string(ClientsMap[_pfds[i].fd].ipAddress) + " MODE " + key + " +o " + ClientsMap[_pfds[i].fd].getNickname() + "\r\n";
 	std::vector<int>::iterator it = channel.clientsFd.begin();
 	while (it != channel.clientsFd.end())

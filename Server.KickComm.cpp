@@ -69,12 +69,6 @@ void Server::handleKickCommand(std::string params, int i, std::map<std::string, 
 				std::string reponse = "476 " + ClientsMap[_pfds[i].fd].getNickname() + " the user is not in the channel\r\n";
 				send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
 				return ;
-
 			}
-		}
-		std::string line_;
-		while(iss >> line_)
-		{
-			// std::cout << "line = " << line_ << std::endl;
 		}
 	}

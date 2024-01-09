@@ -55,9 +55,6 @@ void Server::handleModeCommand(std::string params,int i,std::map<std::string, Ch
 	ss >> channelName;
 	ss >> mode;
 	ss >> target;
-	// std::cout << "channelName: " << channelName << std::endl;
-	// std::cout << "mode: " << mode << std::endl;
-	// std::cout << "target: " << target << std::endl;
 	if (!validMode(mode))
 	{
 		std::string resp = "ERROR Invalid mode: " + mode + "\r\n";
@@ -86,18 +83,15 @@ void Server::handleModeCommand(std::string params,int i,std::map<std::string, Ch
 			if (it2 == it->second.operators.end())
 			{
 				std::string resp = "482 " + ClientsMap[_pfds[i].fd].getNickname() + " " + channelName + " :You're not channel operator\r\n";
-				// std::cout << "response: " << resp;
 				send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 				return;
 			}
-			//set channel mode
 			if (mode.find("k") != std::string::npos)
 			{
 				if (mode[0] == '+') {
 					if (target.empty())
 					{
 						std::string resp = "461 " + ClientsMap[_pfds[i].fd].getNickname() + " MODE :Not enough parameters\r\n";
-						// std::cout << "response: " << resp;
 						send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 						return;
 					}
@@ -116,7 +110,7 @@ void Server::handleModeCommand(std::string params,int i,std::map<std::string, Ch
 					if (target.empty() || !validNumber(target))
 					{
 						std::string resp = "461 " + ClientsMap[_pfds[i].fd].getNickname() + " MODE :Not enough/valid parameters\r\n";
-						// std::cout << "response: " << resp;
+						
 						send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 						return;
 					}
@@ -132,7 +126,6 @@ void Server::handleModeCommand(std::string params,int i,std::map<std::string, Ch
 				if (target.empty())
 				{
 					std::string resp = "461 " + ClientsMap[_pfds[i].fd].getNickname() + " MODE :Not enough parameters\r\n";
-					// std::cout << "response: " << resp;
 					send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 					return;
 				}
@@ -147,7 +140,7 @@ void Server::handleModeCommand(std::string params,int i,std::map<std::string, Ch
 				if (it3 == it->second.clientsFd.end())
 				{
 					std::string resp = "401 " + ClientsMap[_pfds[i].fd].getNickname() + " " + nickname + " :No such nick/channel\r\n";
-					// std::cout << "response: " << resp;
+					
 					send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 					return;
 				}
@@ -182,16 +175,13 @@ void Server::handleModeCommand(std::string params,int i,std::map<std::string, Ch
 				}
 			}
 			std::string resp = ":" + ClientsMap[_pfds[i].fd].getNickname() + " MODE " + channelName + " " + mode + " " + target + "\r\n";
-			// std::cout << "response: " << resp;
 			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 		} else {
 			std::string resp = "403 " + ClientsMap[_pfds[i].fd].getNickname() + " :" + channelName +" No such channel\r\n";
-			// std::cout << "response: " << resp;
 			send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 		}
 	} else {
 		std::string resp = "403 " + ClientsMap[_pfds[i].fd].getNickname() + " :" + channelName +" No such channel\r\n";
-		// std::cout << "response: " << resp;
 		send(_pfds[i].fd, resp.c_str(), resp.length(), 0);
 	}
 }

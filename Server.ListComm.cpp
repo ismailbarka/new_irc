@@ -14,15 +14,13 @@
 
 void Server::handleListCommand(int i)
 {
-	//list all channels
 	std::string reponse = "321 Channel :Users  Name\r\n";
 	send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
 	std::map<std::string, Channels>::iterator it = channelsV.begin();
 	while (it != channelsV.end())
 	{
 		std::string reponse = "322 Channel " + it->first + " " + std::to_string(it->second.clientsFd.size()) + " " + it->second.topic + "\r\n";
-		//membres count
-		// std::cout << reponse << std::endl;
+
 		send(_pfds[i].fd, reponse.c_str(), reponse.length(), 0);
 		it++;
 	}

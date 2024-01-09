@@ -49,7 +49,7 @@ Server::Server(char **av)
 	int tmp = 1;
 	int nRet = setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &tmp, sizeof(int));
 	if (!nRet) {
-		// std::cout << "nRet success\n";
+		
 	} else {
 		std::cout << "nRet failed\n";
 		throw setsockoptException();
@@ -124,7 +124,7 @@ void Server::welcomeNewClient(int & clients_numbers)
 	int clientSocket = accept(serverSocket, (struct sockaddr *)&client_addr, &client_addr_size);
 	if (clientSocket < 0)
 		throw acceptException();
-	int nFl = fcntl(clientSocket, F_SETFL, O_NONBLOCK); // set socket to non-blocking mode means that recv will not block if there is no data to receive and will return -1 with errno set to EAGAIN or EWOULDBLOCK instead of blocking the execution of the program until data is received or an error occurs (the default behavior)
+	int nFl = fcntl(clientSocket, F_SETFL, O_NONBLOCK); 
 	if (nFl < 0) {
 		std::cout << "failed to set socket to non-blocking mode\n";
 		throw fcntlException();
