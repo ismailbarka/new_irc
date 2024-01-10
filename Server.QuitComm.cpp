@@ -6,7 +6,7 @@
 /*   By: tmoumni <tmoumni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 10:40:47 by tmoumni           #+#    #+#             */
-/*   Updated: 2024/01/07 17:35:38 by tmoumni          ###   ########.fr       */
+/*   Updated: 2024/01/10 11:16:36 by tmoumni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,13 @@ void Server::handleQuitCommand(int i, int & clients_numbers, std::string params)
 		response = ":" + ClientsMap[_pfds[i].fd].getNickname() + "!~" + ClientsMap[_pfds[i].fd].getUserName() + "@" 
 		+ std::string(ClientsMap[_pfds[i].fd].ipAddress) + " QUIT " + params + "\r\n";
 		// std::cout << "response: " << response << std::endl;
-		for (int j = 1; j < clients_numbers; j++)
-		{
-			if (_pfds[j].fd != -1) {
-				if (send(_pfds[j].fd, response.c_str(), response.length(), 0) == -1)
-					throw sendException();
-			}
-		}
+		// for (int j = 1; j < clients_numbers; j++)
+		// {
+		// 	if (_pfds[j].fd != -1) {
+		// 		if (send(_pfds[j].fd, response.c_str(), response.length(), 0) == -1)
+		// 			throw sendException();
+		// 	}
+		// }
 	}
 	// std::cout << "client disconnected: " << ClientsMap[_pfds[i].fd].getNickname() << " -> " << _pfds[i].fd << std::endl;
 	ClientsMap.erase(_pfds[i].fd);
